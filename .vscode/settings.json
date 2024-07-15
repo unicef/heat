@@ -1,0 +1,48 @@
+{
+    //
+    // Set correct python path to venv's one
+    //
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    //
+    // Very optional: type checking. Remove the line if your project doesn't really use or respect
+    // type hints. You should give it a try, though. They're great.
+    //
+    "python.analysis.typeCheckingMode": "basic",
+    //
+    // Hide .venv from explorer and searchbar
+    //
+    "files.watcherExclude": {
+        "**/.venv/**": true
+    },
+    "files.exclude": {
+        "**/.venv/": true
+    },
+    "search.exclude": {
+        "**/.venv/": true
+    },
+    //
+    // Linting and formatting
+    //
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "black-formatter.importStrategy": "fromEnvironment",
+    "isort.importStrategy": "fromEnvironment",
+    "flake8.importStrategy": "fromEnvironment",
+    "isort.args": ["--settings-path", "${workspaceFolder}/pyproject.toml"],
+    "flake8.args": ["--config=${workspaceFolder}/.flake8"],
+    "editor.rulers": [
+        100 // if changing line length, also do it in .flake8 and pyproject.toml's [tool.black] section
+    ],
+    "editor.wordWrapColumn": 100,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    //
+    // Jupyter
+    //
+    "jupyter.notebookFileRoot": "${workspaceFolder}",
+    "jupyter.interactiveWindow.textEditor.executeSelection": true,
+    // TODO: this setting is showing a deprecation warning. Maybe we should drop it?
+    "jupyter.generateSVGPlots": true,
+}

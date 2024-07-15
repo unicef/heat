@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 100
+preview = true
+
+[tool.isort]
+atomic = true
+profile = "black"
+skip = [".venv"]
+
+[tool.poetry]
+name = "heatwaves-app"
+version = "0.1.0"
+description = ""
+authors = ["alischandy <alicia@tryolabs.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.0"
+black = "^24.4.2"
+isort = "^5.13.2"
+docstr-coverage = "^2.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
