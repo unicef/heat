@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/georaster"></script>
+    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script>
+        // initialize leaflet map
+        var map = L.map('map').setView([0, 0], 2);
+
+        // add OpenStreetMap basemap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
+
+        parseGeoraster(url_to_geotiff_file).then(georaster => {
+            console.log("GeoTIFF parsed successfully");
+            console.log("Georaster object:", georaster);
+
+
+            var layer = new GeoRasterLayer({
+                attribution: "Unicef",
+                georaster: georaster,
+                opacity: 0.7,
+                resolution: 256,
+                pixelValuesToColorFn: values => {
+                    var value = values[0]; // we only need the first band
+                    if (value > 0) {
+                        return 'rgba(255, 0, 0, 1)'; // Red color for values > 0
+                    }
+                    return null; // transparent for all other values
+                }
+            });
+            layer.addTo(map);
+
+            // Set map view to the layer's bounds
+            map.fitBounds(layer.getBounds());
+        }).catch(error => {
+            console.error("Error parsing GeoTIFF:", error);
+        });
+    </script>
+</body>
+
+</html>
