@@ -16,43 +16,49 @@
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script>
-        // initialize leaflet map
         var map = L.map('map').setView([0, 0], 2);
-
-        // add OpenStreetMap basemap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
         var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
 
-        parseGeoraster(url_to_geotiff_file).then(georaster => {
-            console.log("GeoTIFF parsed successfully");
-            console.log("Georaster object:", georaster);
+        fetch(url_to_geotiff_file)
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => {
+                parseGeoraster(arrayBuffer).then(georaster => {
+                    const min = georaster.mins[0];
+                    const max = georaster.maxs[0];
 
+                    // available color scales can be found by running console.log(chroma.brewer);
+                    console.log(chroma.brewer);
+                    var scale = chroma.scale('OrRd').domain([min, max]);
 
-            var layer = new GeoRasterLayer({
-                attribution: "Unicef",
-                georaster: georaster,
-                opacity: 0.7,
-                resolution: 256,
-                pixelValuesToColorFn: values => {
-                    var value = values[0]; // we only need the first band
-                    if (value > 0) {
-                        return 'rgba(255, 0, 0, 1)'; // Red color for values > 0
-                    }
-                    return null; // transparent for all other values
-                }
+                    var layer = new GeoRasterLayer({
+                        attribution: "Unicef",
+                        georaster: georaster,
+                        opacity: 0.7,
+                        pixelValuesToColorFn: function (pixelValues) {
+                            var pixelValue = pixelValues[1]; // access first band of the raster
+
+                            // Handle non-data values explicitly
+                            if (pixelValue === 0 || pixelValue === null || pixelValue === undefined) return null;
+
+                            var color = scale(pixelValue).hex();
+
+                            return color;
+                        },
+                        resolution: 256
+                    });
+                    console.log("layer:", layer);
+                    layer.addTo(map);
+
+                    map.fitBounds(layer.getBounds());
+                });
             });
-            layer.addTo(map);
-
-            // Set map view to the layer's bounds
-            map.fitBounds(layer.getBounds());
-        }).catch(error => {
-            console.error("Error parsing GeoTIFF:", error);
-        });
     </script>
 </body>
 
