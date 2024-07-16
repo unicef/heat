@@ -9,10 +9,24 @@
             height: 600px;
             width: 100%;
         }
+
+        #controls {
+            margin: 10px;
+        }
     </style>
 </head>
 
 <body>
+    <h1>Heatwave Indicators</h1>
+    <div id="controls">
+        <label for="bandSelector">Select sub-indicator:</label>
+        <select id="bandSelector">
+            <option value="0">Frequency</option>
+            <option value="1">Duration</option>
+            <option value="2">Severity</option>
+            <option value="3">Extreme High Temp.</option>
+        </select>
+    </div>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
@@ -25,6 +39,7 @@
         }).addTo(map);
 
         var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
+        var currentLayer;
 
         fetch(url_to_geotiff_file)
             .then(response => response.arrayBuffer())
@@ -32,31 +47,39 @@
                 parseGeoraster(arrayBuffer).then(georaster => {
                     const min = georaster.mins[0];
                     const max = georaster.maxs[0];
+                    const range = georaster.ranges[0];
 
-                    // available color scales can be found by running console.log(chroma.brewer);
-                    console.log(chroma.brewer);
                     var scale = chroma.scale('OrRd').domain([min, max]);
 
-                    var layer = new GeoRasterLayer({
-                        attribution: "Unicef",
-                        georaster: georaster,
-                        opacity: 0.7,
-                        pixelValuesToColorFn: function (pixelValues) {
-                            var pixelValue = pixelValues[1]; // access first band of the raster
+                    function addLayer(band) {
+                        if (currentLayer) {
+                            map.removeLayer(currentLayer);
+                        }
+                        currentLayer = new GeoRasterLayer({
+                            attribution: "Unicef",
+                            georaster: georaster,
+                            opacity: 0.7,
+                            pixelValuesToColorFn: function (pixelValues) {
+                                var pixelValue = pixelValues[band];
 
-                            // Handle non-data values explicitly
-                            if (pixelValue === 0 || pixelValue === null || pixelValue === undefined) return null;
+                                if (pixelValue === 0 || pixelValue === null || pixelValue === undefined) return null;
 
-                            var color = scale(pixelValue).hex();
+                                var color = scale(pixelValue).hex();
 
-                            return color;
-                        },
-                        resolution: 256
+                                return color;
+                            },
+                            resolution: 256
+                        });
+                        currentLayer.addTo(map);
+                        map.fitBounds(currentLayer.getBounds());
+                    }
+
+                    document.getElementById('bandSelector').addEventListener('change', function (event) {
+                        addLayer(parseInt(event.target.value));
                     });
-                    console.log("layer:", layer);
-                    layer.addTo(map);
 
-                    map.fitBounds(layer.getBounds());
+                    // Initialize with the first band
+                    addLayer(0);
                 });
             });
     </script>
