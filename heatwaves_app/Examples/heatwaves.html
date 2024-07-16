@@ -17,6 +17,15 @@
         #minMaxDisplay {
             margin: 10px;
         }
+
+        #legend {
+            background: white;
+            padding: 10px;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
@@ -36,6 +45,8 @@
         <strong>Min Value:</strong> <span id="minValue"></span>
         <strong>Max Value:</strong> <span id="maxValue"></span>
     </div>
+    <div id="legend"></div>
+
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
@@ -58,12 +69,30 @@
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => {
                 parseGeoraster(arrayBuffer).then(georaster => {
+                    function updateLegend(min, max, scale) {
+                        var legend = document.getElementById('legend');
+                        legend.innerHTML = '<strong>Color Scale</strong><br>';
+
+                        // Create gradient bar or discrete color steps
+                        const steps = 10; // Number of steps in the gradient
+                        const range = max - min;
+                        for (let i = 0; i <= steps; i++) {
+                            const value = min + i * (range / steps);
+                            const color = scale(value).hex();
+                            legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
+                        }
+
+                        // Append min and max labels below the color bar
+                        legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
+                    }
 
                     function addLayer(band) {
                         // Recalculate min and max for the selected band
                         const min = georaster.mins[band];
                         const max = georaster.maxs[band];
                         const scale = chroma.scale('OrRd').domain([min, max]); // Recreate the scale
+
+                        updateLegend(min, max, scale);
 
                         document.getElementById('minValue').textContent = min.toFixed(0); // Formatting to 2 decimal places
                         document.getElementById('maxValue').textContent = max.toFixed(0);
