@@ -13,6 +13,10 @@
         #controls {
             margin: 10px;
         }
+
+        #minMaxDisplay {
+            margin: 10px;
+        }
     </style>
 </head>
 
@@ -28,12 +32,21 @@
         </select>
     </div>
     <div id="map"></div>
+    <div id="minMaxDisplay">
+        <strong>Min Value:</strong> <span id="minValue"></span>
+        <strong>Max Value:</strong> <span id="maxValue"></span>
+    </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script>
-        var map = L.map('map').setView([0, 0], 2);
+        var map = L.map('map', {
+            minZoom: 2, // Sets minimum zoom level to prevent zooming out too much
+            maxZoom: 18, // Sets maximum zoom level if needed
+            maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
+            worldCopyJump: false // Prevents the map from wrapping around
+        }).setView([40, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
@@ -45,18 +58,21 @@
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => {
                 parseGeoraster(arrayBuffer).then(georaster => {
-                    const min = georaster.mins[0];
-                    const max = georaster.maxs[0];
-                    const range = georaster.ranges[0];
-
-                    var scale = chroma.scale('OrRd').domain([min, max]);
 
                     function addLayer(band) {
+                        // Recalculate min and max for the selected band
+                        const min = georaster.mins[band];
+                        const max = georaster.maxs[band];
+                        const scale = chroma.scale('OrRd').domain([min, max]); // Recreate the scale
+
+                        document.getElementById('minValue').textContent = min.toFixed(0); // Formatting to 2 decimal places
+                        document.getElementById('maxValue').textContent = max.toFixed(0);
+
                         if (currentLayer) {
                             map.removeLayer(currentLayer);
                         }
                         currentLayer = new GeoRasterLayer({
-                            attribution: "Unicef",
+                            attribution: "x",
                             georaster: georaster,
                             opacity: 0.7,
                             pixelValuesToColorFn: function (pixelValues) {
