@@ -30,7 +30,9 @@
 </head>
 
 <body>
+    <!-- define header -->
     <h1>Heatwave Indicators</h1>
+    <!-- define controls containers -->
     <div id="controls">
         <label for="bandSelector">Select sub-indicator:</label>
         <select id="bandSelector">
@@ -41,17 +43,23 @@
         </select>
         <button id="downloadBtn" style="margin-left: 10px;">Download TIF</button>
     </div>
+    <!-- define map container -->
     <div id="map"></div>
+    <!-- define max and min band values containers -->
     <div id="minMaxDisplay">
         <strong>Min Value:</strong> <span id="minValue"></span>
         <strong>Max Value:</strong> <span id="maxValue"></span>
     </div>
+    <!-- define colourmap scale container -->
     <div id="legend"></div>
 
+    <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+
+    <!-- define map -->
     <script>
         var map = L.map('map', {
             minZoom: 2, // Sets minimum zoom level to prevent zooming out too much
@@ -59,11 +67,14 @@
             maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
             worldCopyJump: false // Prevents the map from wrapping around
         }).setView([40, 0], 2);
+
+        // add open street map layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             noWrap: true,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
+        // define download url for tif file
         var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
         var currentLayer;
 
@@ -71,6 +82,7 @@
             .then(response => response.arrayBuffer())
             .then(arrayBuffer => {
                 parseGeoraster(arrayBuffer).then(georaster => {
+                    // The next function updates the 'legend' element with a color scale from min to max values of the band.
                     function updateLegend(min, max, scale) {
                         var legend = document.getElementById('legend');
                         legend.innerHTML = '<strong>Color Scale</strong><br>';
@@ -87,7 +99,7 @@
                         // Append min and max labels below the color bar
                         legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
                     }
-
+                    // The next function adds a color-mapped layer to the map for a specific band and updates the UI.
                     function addLayer(band) {
                         // Recalculate min and max for the selected band
                         const min = georaster.mins[band];
@@ -96,17 +108,20 @@
 
                         updateLegend(min, max, scale);
 
-                        document.getElementById('minValue').textContent = min.toFixed(0); // Formatting to 2 decimal places
+                        // populate max and min band values containers
+                        document.getElementById('minValue').textContent = min.toFixed(0); // Formatting to 0 decimal places
                         document.getElementById('maxValue').textContent = max.toFixed(0);
 
+                        // Remove current layer and add new one corresponding to the selected band:
                         if (currentLayer) {
                             map.removeLayer(currentLayer);
                         }
                         currentLayer = new GeoRasterLayer({
                             attribution: "Unicef",
-                            noWrap: true,
+                            noWrap: true, // to prevent map repeated horizontally
                             georaster: georaster,
                             opacity: 0.7,
+                            // The next function maps the pixel values to a color:
                             pixelValuesToColorFn: function (pixelValues) {
                                 var pixelValue = pixelValues[band];
 
@@ -116,16 +131,17 @@
 
                                 return color;
                             },
-                            resolution: 256
+                            resolution: 256 // the higher this value, the more detail you get, but also more data to load and process
                         });
                         currentLayer.addTo(map);
                         map.fitBounds(currentLayer.getBounds());
                     }
 
+                    // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band index.
                     document.getElementById('bandSelector').addEventListener('change', function (event) {
                         addLayer(parseInt(event.target.value));
                     });
-
+                    // Listen for a click event on the 'downloadBtn' element and open a new window (or tab) with the URL to a GeoTIFF file
                     document.getElementById('downloadBtn').addEventListener('click', function () {
                         window.open(url_to_geotiff_file);
                     });
