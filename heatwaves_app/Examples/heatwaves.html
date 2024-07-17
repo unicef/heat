@@ -14,10 +14,6 @@
             margin: 10px;
         }
 
-        #minMaxDisplay {
-            margin: 10px;
-        }
-
         #legend {
             background: white;
             padding: 10px;
@@ -55,11 +51,6 @@
     </div>
     <!-- define map container -->
     <div id="map"></div>
-    <!-- define max and min band values containers -->
-    <div id="minMaxDisplay">
-        <strong>Min Value:</strong> <span id="minValue"></span>
-        <strong>Max Value:</strong> <span id="maxValue"></span>
-    </div>
     <!-- define colourmap scale container -->
     <div id="legend"></div>
     <!-- define loading message container -->
@@ -133,10 +124,6 @@
 
                         updateLegend(min, max, scale);
 
-                        // populate max and min band values containers
-                        document.getElementById('minValue').textContent = min.toFixed(0); // Formatting to 0 decimal places
-                        document.getElementById('maxValue').textContent = max.toFixed(0);
-
                         // Remove current layer and add new one corresponding to the selected band:
                         if (currentLayer) {
                             map.removeLayer(currentLayer);
@@ -163,8 +150,9 @@
                             pixelValuesToColorFn: function (pixelValues) {
                                 var pixelValue = pixelValues[band];
 
-                                if (pixelValue === 0 || pixelValue === null || pixelValue === undefined) return null;
-
+                                if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
+                                    return null; // Returning null will make the pixel transparent
+                                }
                                 var color = scale(pixelValue).hex();
 
                                 return color;
