@@ -39,6 +39,7 @@
             <option value="2">Severity</option>
             <option value="3">Extreme High Temp.</option>
         </select>
+        <button id="downloadBtn" style="margin-left: 10px;">Download TIF</button>
     </div>
     <div id="map"></div>
     <div id="minMaxDisplay">
@@ -59,6 +60,7 @@
             worldCopyJump: false // Prevents the map from wrapping around
         }).setView([40, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            noWrap: true,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
@@ -101,7 +103,8 @@
                             map.removeLayer(currentLayer);
                         }
                         currentLayer = new GeoRasterLayer({
-                            attribution: "x",
+                            attribution: "Unicef",
+                            noWrap: true,
                             georaster: georaster,
                             opacity: 0.7,
                             pixelValuesToColorFn: function (pixelValues) {
@@ -122,6 +125,11 @@
                     document.getElementById('bandSelector').addEventListener('change', function (event) {
                         addLayer(parseInt(event.target.value));
                     });
+
+                    document.getElementById('downloadBtn').addEventListener('click', function () {
+                        window.open(url_to_geotiff_file);
+                    });
+
 
                     // Initialize with the first band
                     addLayer(0);
