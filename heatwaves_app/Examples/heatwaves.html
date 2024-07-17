@@ -26,6 +26,16 @@
             right: 20px;
             z-index: 1000;
         }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -52,6 +62,18 @@
     </div>
     <!-- define colourmap scale container -->
     <div id="legend"></div>
+    <!-- define loading message container -->
+    <div id="loading"
+        style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="spinner"
+                style="margin: 0 auto; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite;">
+            </div>
+            <p style="text-align: center; margin-top: 10px;">Loading...</p>
+        </div>
+    </div>
+
+
 
     <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -77,6 +99,9 @@
         // define download url for tif file
         var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
         var currentLayer;
+
+        // Show loading message
+        document.getElementById('loading').style.display = 'block';
 
         fetch(url_to_geotiff_file)
             .then(response => response.arrayBuffer())
@@ -121,6 +146,19 @@
                             noWrap: true, // to prevent map repeated horizontally
                             georaster: georaster,
                             opacity: 0.7,
+                            // Callback for when tiles start loading
+                            onTileLoadStart: function () {
+                                document.getElementById('loading').style.display = 'block';
+                            },
+                            // Callback for when all tiles are loaded
+                            onTileLoadEnd: function () {
+                                document.getElementById('loading').style.display = 'none';
+                            },
+                            // Callback for when there is an error loading tiles
+                            onTileLoadError: function () {
+                                document.getElementById('loading').style.display = 'none';
+                                alert('Failed to load data. Please try again.');
+                            },
                             // The next function maps the pixel values to a color:
                             pixelValuesToColorFn: function (pixelValues) {
                                 var pixelValue = pixelValues[band];
@@ -136,6 +174,9 @@
                         currentLayer.addTo(map);
                         map.fitBounds(currentLayer.getBounds());
                     }
+
+                    // Hide loading message
+                    document.getElementById('loading').style.display = 'none';
 
                     // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band index.
                     document.getElementById('bandSelector').addEventListener('change', function (event) {
