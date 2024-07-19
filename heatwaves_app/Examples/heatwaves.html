@@ -4,6 +4,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Styles for the map and UI elements -->
     <style>
         #map {
             height: 600px;
@@ -32,13 +34,35 @@
                 transform: rotate(360deg);
             }
         }
+
+        #loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+
+        .spinner {
+            margin: 0 auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
     </style>
 </head>
 
 <body>
-    <!-- define header -->
+    <!-- Website title -->
     <h1>Children Exposure to Climate Shocks</h1>
-    <!-- define controls containers -->
+
+    <!-- Control panel for selecting year and sub-indicators, and download button -->
     <div id="controls">
         <label for="yearDropdown">Select Year:</label>
         <select id="yearDropdown">
@@ -58,17 +82,15 @@
         </select>
         <button id="downloadBtn" style="margin-left: 10px;">Download TIF</button>
     </div>
+
     <!-- define map container -->
     <div id="map"></div>
     <!-- define colourmap scale container -->
     <div id="legend"></div>
     <!-- define loading message container -->
-    <div id="loading"
-        style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000;">
+    <div id="loading">
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <div class="spinner"
-                style="margin: 0 auto; width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite;">
-            </div>
+            <div class="spinner"></div>
             <p style="text-align: center; margin-top: 10px;">Loading...</p>
         </div>
     </div>
@@ -79,23 +101,23 @@
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 
-    <!-- define map -->
+    <!-- Map initialization and control script -->
     <script>
         var map = L.map('map', {
-            minZoom: 2, // Sets minimum zoom level to prevent zooming out too much
-            maxZoom: 18, // Sets maximum zoom level if needed
+            minZoom: 2,
+            maxZoom: 18,
             maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
             worldCopyJump: false // Prevents the map from wrapping around
         }).setView([40, 0], 2);
 
-        // add open street map layer
+        // Add Open Street Map layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             noWrap: true,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // define download url for tif file
-        var tiffUrls = {
+        // URL storage for TIFF files, mapped by year
+        const tiffUrls = {
             "1970": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1970s_proj.tif",
             "1980": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1980s_proj.tif",
             "1990": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1990s_proj.tif",
@@ -103,73 +125,81 @@
             "2010": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2010s_proj.tif",
             "2020": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif"
         };
-        var currentLayer;
-        var currentGeoRaster;
-        var currentBand = 0;
+        var currentLayer, currentGeoRaster, currentBand = 0;
+        const loadingDiv = document.getElementById('loading');
 
-        // The next function
+        // Show or hide loading spinner accordingly
+        function toggleSpinner(show) {
+            loadingDiv.style.display = show ? 'block' : 'none';
+        }
+
+        // Load TIFF file for the selected year and handle it with GeoRaster
         function loadTiffForYear(year) {
-            // Show loading message
-            document.getElementById('loading').style.display = 'block';
+            toggleSpinner(true);
 
-            // Fetch the corresponding TIFF file
             fetch(tiffUrls[year])
                 .then(response => response.arrayBuffer())
                 .then(arrayBuffer => {
                     parseGeoraster(arrayBuffer).then(georaster => {
                         currentGeoRaster = georaster;
-                        addLayer(currentBand); // Start with the first band
-                        document.getElementById('loading').style.display = 'none';
+                        addLayer(currentBand);
+                        toggleSpinner(false);
                     });
                 })
         }
 
+        // Add raster layer to the map and update the legend with color scale
         function addLayer(band) {
-            if (!currentGeoRaster) return;
+            if (!currentGeoRaster) return; // Abort if there is no data available.
 
+            // Determine color scale range.
             const min = currentGeoRaster.mins[band];
             const max = currentGeoRaster.maxs[band];
+
+            // Create color scale from red to orange ('OrRd') that spans from the calculated min to max values.
             const scale = chroma.scale('OrRd').domain([min, max]);
 
-            // The next function updates the 'legend' element with a color scale from min to max values of the band.
+            // Update the 'legend' element to visually represent the color scale.
             function updateLegend(min, max, scale) {
                 var legend = document.getElementById('legend');
                 legend.innerHTML = '<strong>Color Scale</strong><br>';
-
                 // Create gradient bar or discrete color steps
-                const steps = 10; // Number of steps in the gradient
+                const steps = 10;
                 const range = max - min;
                 for (let i = 0; i <= steps; i++) {
                     const value = min + i * (range / steps);
                     const color = scale(value).hex();
                     legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
                 }
-
                 // Append min and max labels below the color bar
                 legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
             }
 
             updateLegend(min, max, scale);
 
+            // Remove previous layer (if any)
             if (currentLayer) {
                 map.removeLayer(currentLayer);
             }
 
+            // Add new GeoRaster layer
             currentLayer = new GeoRasterLayer({
                 attribution: "Unicef",
-                noWrap: true,
+                noWrap: true, // Prevents from repeating the map at the edges.
                 georaster: currentGeoRaster,
                 opacity: 0.7,
+                // Handle the loading spinner.
                 onTileLoadStart: function () {
-                    document.getElementById('loading').style.display = 'block';
+                    toggleSpinner(true);
                 },
                 onTileLoadEnd: function () {
-                    document.getElementById('loading').style.display = 'none';
+                    toggleSpinner(false);
                 },
                 onTileLoadError: function () {
-                    document.getElementById('loading').style.display = 'none';
+                    toggleSpinner(false);
                     alert('Failed to load data. Please try again.');
                 },
+                // Assign colors to individual pixels based on their value
                 pixelValuesToColorFn: function (pixelValues) {
                     var pixelValue = pixelValues[band];
                     if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
@@ -179,28 +209,30 @@
                 },
                 resolution: 256
             });
-
+            // Display the layer on the map
             currentLayer.addTo(map);
+            // Adjust the map's view to fit the bounds of the newly added raster layer.
             map.fitBounds(currentLayer.getBounds());
         }
 
         // Initial load
-        document.getElementById('loading').style.display = 'block';
         loadTiffForYear(document.getElementById('yearDropdown').value);
 
-        // Listen for a change event to load the TIF corresponding to the corresponding year
+        // Event listeners for dropdown changes and button clicks
+
+        // Listen for a change event on the 'yearDropdown' element and call the loadTiffForYear with the newly selected year.
         document.getElementById('yearDropdown').addEventListener('change', function () {
             var selectedYear = this.value;
             loadTiffForYear(selectedYear);
         });
 
-        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band index.
+        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band.
         document.getElementById('bandSelector').addEventListener('change', function (event) {
             currentBand = parseInt(event.target.value);
             addLayer(currentBand);
         });
 
-        // Listen for a click event on the 'downloadBtn' element and open a new window (or tab) with the URL to a GeoTIFF file
+        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
         document.getElementById('downloadBtn').addEventListener('click', function () {
             var year = document.getElementById('yearDropdown').value;
             window.open(tiffUrls[year], '_blank');
