@@ -37,9 +37,18 @@
 
 <body>
     <!-- define header -->
-    <h1>Heatwave Indicators</h1>
+    <h1>Children Exposure to Climate Shocks</h1>
     <!-- define controls containers -->
     <div id="controls">
+        <label for="yearDropdown">Select Year:</label>
+        <select id="yearDropdown">
+            <option value="1970">1970</option>
+            <option value="1980">1980</option>
+            <option value="1990">1990</option>
+            <option value="2000">2000</option>
+            <option value="2010">2010</option>
+            <option value="2020">2020</option>
+        </select>
         <label for="bandSelector">Select sub-indicator:</label>
         <select id="bandSelector">
             <option value="0">Frequency</option>
@@ -64,8 +73,6 @@
         </div>
     </div>
 
-
-
     <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
@@ -88,98 +95,117 @@
         }).addTo(map);
 
         // define download url for tif file
-        var url_to_geotiff_file = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif";
+        var tiffUrls = {
+            "1970": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1970s_proj.tif",
+            "1980": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1980s_proj.tif",
+            "1990": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1990s_proj.tif",
+            "2000": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2000s_proj.tif",
+            "2010": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2010s_proj.tif",
+            "2020": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif"
+        };
         var currentLayer;
+        var currentGeoRaster;
+        var currentBand = 0;
 
-        // Show loading message
-        document.getElementById('loading').style.display = 'block';
+        // The next function
+        function loadTiffForYear(year) {
+            // Show loading message
+            document.getElementById('loading').style.display = 'block';
 
-        fetch(url_to_geotiff_file)
-            .then(response => response.arrayBuffer())
-            .then(arrayBuffer => {
-                parseGeoraster(arrayBuffer).then(georaster => {
-                    // The next function updates the 'legend' element with a color scale from min to max values of the band.
-                    function updateLegend(min, max, scale) {
-                        var legend = document.getElementById('legend');
-                        legend.innerHTML = '<strong>Color Scale</strong><br>';
+            // Fetch the corresponding TIFF file
+            fetch(tiffUrls[year])
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => {
+                    parseGeoraster(arrayBuffer).then(georaster => {
+                        currentGeoRaster = georaster;
+                        addLayer(currentBand); // Start with the first band
+                        document.getElementById('loading').style.display = 'none';
+                    });
+                })
+        }
 
-                        // Create gradient bar or discrete color steps
-                        const steps = 10; // Number of steps in the gradient
-                        const range = max - min;
-                        for (let i = 0; i <= steps; i++) {
-                            const value = min + i * (range / steps);
-                            const color = scale(value).hex();
-                            legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
-                        }
+        function addLayer(band) {
+            if (!currentGeoRaster) return;
 
-                        // Append min and max labels below the color bar
-                        legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
-                    }
-                    // The next function adds a color-mapped layer to the map for a specific band and updates the UI.
-                    function addLayer(band) {
-                        // Recalculate min and max for the selected band
-                        const min = georaster.mins[band];
-                        const max = georaster.maxs[band];
-                        const scale = chroma.scale('OrRd').domain([min, max]); // Recreate the scale
+            const min = currentGeoRaster.mins[band];
+            const max = currentGeoRaster.maxs[band];
+            const scale = chroma.scale('OrRd').domain([min, max]);
 
-                        updateLegend(min, max, scale);
+            // The next function updates the 'legend' element with a color scale from min to max values of the band.
+            function updateLegend(min, max, scale) {
+                var legend = document.getElementById('legend');
+                legend.innerHTML = '<strong>Color Scale</strong><br>';
 
-                        // Remove current layer and add new one corresponding to the selected band:
-                        if (currentLayer) {
-                            map.removeLayer(currentLayer);
-                        }
-                        currentLayer = new GeoRasterLayer({
-                            attribution: "Unicef",
-                            noWrap: true, // to prevent map repeated horizontally
-                            georaster: georaster,
-                            opacity: 0.7,
-                            // Callback for when tiles start loading
-                            onTileLoadStart: function () {
-                                document.getElementById('loading').style.display = 'block';
-                            },
-                            // Callback for when all tiles are loaded
-                            onTileLoadEnd: function () {
-                                document.getElementById('loading').style.display = 'none';
-                            },
-                            // Callback for when there is an error loading tiles
-                            onTileLoadError: function () {
-                                document.getElementById('loading').style.display = 'none';
-                                alert('Failed to load data. Please try again.');
-                            },
-                            // The next function maps the pixel values to a color:
-                            pixelValuesToColorFn: function (pixelValues) {
-                                var pixelValue = pixelValues[band];
+                // Create gradient bar or discrete color steps
+                const steps = 10; // Number of steps in the gradient
+                const range = max - min;
+                for (let i = 0; i <= steps; i++) {
+                    const value = min + i * (range / steps);
+                    const color = scale(value).hex();
+                    legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
+                }
 
-                                if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
-                                    return null; // Returning null will make the pixel transparent
-                                }
-                                var color = scale(pixelValue).hex();
+                // Append min and max labels below the color bar
+                legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
+            }
 
-                                return color;
-                            },
-                            resolution: 256 // the higher this value, the more detail you get, but also more data to load and process
-                        });
-                        currentLayer.addTo(map);
-                        map.fitBounds(currentLayer.getBounds());
-                    }
+            updateLegend(min, max, scale);
 
-                    // Hide loading message
+            if (currentLayer) {
+                map.removeLayer(currentLayer);
+            }
+
+            currentLayer = new GeoRasterLayer({
+                attribution: "Unicef",
+                noWrap: true,
+                georaster: currentGeoRaster,
+                opacity: 0.7,
+                onTileLoadStart: function () {
+                    document.getElementById('loading').style.display = 'block';
+                },
+                onTileLoadEnd: function () {
                     document.getElementById('loading').style.display = 'none';
-
-                    // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band index.
-                    document.getElementById('bandSelector').addEventListener('change', function (event) {
-                        addLayer(parseInt(event.target.value));
-                    });
-                    // Listen for a click event on the 'downloadBtn' element and open a new window (or tab) with the URL to a GeoTIFF file
-                    document.getElementById('downloadBtn').addEventListener('click', function () {
-                        window.open(url_to_geotiff_file);
-                    });
-
-
-                    // Initialize with the first band
-                    addLayer(0);
-                });
+                },
+                onTileLoadError: function () {
+                    document.getElementById('loading').style.display = 'none';
+                    alert('Failed to load data. Please try again.');
+                },
+                pixelValuesToColorFn: function (pixelValues) {
+                    var pixelValue = pixelValues[band];
+                    if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
+                        return null;
+                    }
+                    return scale(pixelValue).hex();
+                },
+                resolution: 256
             });
+
+            currentLayer.addTo(map);
+            map.fitBounds(currentLayer.getBounds());
+        }
+
+        // Initial load
+        document.getElementById('loading').style.display = 'block';
+        loadTiffForYear(document.getElementById('yearDropdown').value);
+
+        // Listen for a change event to load the TIF corresponding to the corresponding year
+        document.getElementById('yearDropdown').addEventListener('change', function () {
+            var selectedYear = this.value;
+            loadTiffForYear(selectedYear);
+        });
+
+        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band index.
+        document.getElementById('bandSelector').addEventListener('change', function (event) {
+            currentBand = parseInt(event.target.value);
+            addLayer(currentBand);
+        });
+
+        // Listen for a click event on the 'downloadBtn' element and open a new window (or tab) with the URL to a GeoTIFF file
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            var year = document.getElementById('yearDropdown').value;
+            window.open(tiffUrls[year], '_blank');
+        });
+
     </script>
 </body>
 
