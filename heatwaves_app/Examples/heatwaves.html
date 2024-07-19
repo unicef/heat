@@ -84,16 +84,18 @@
     </div>
 
     <!-- define map container -->
-    <div id="map"></div>
-    <!-- define colourmap scale container -->
-    <div id="legend"></div>
-    <!-- define loading message container -->
-    <div id="loading">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <div class="spinner"></div>
-            <p style="text-align: center; margin-top: 10px;">Loading...</p>
+    <div id="map">
+        <!-- define loading message container -->
+        <div id="loading">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="spinner"></div>
+                <p style="text-align: center; margin-top: 10px;">Loading...</p>
+            </div>
         </div>
     </div>
+
+    <!-- define colourmap scale container -->
+    <div id="legend"></div>
 
     <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
