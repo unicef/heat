@@ -127,6 +127,17 @@
             "2010": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2010s_proj.tif",
             "2020": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj.tif"
         };
+
+        // Maximum and minimum values per band are determined by calculating the mean and standard deviation for 2020.
+        // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
+        // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
+        const bandRanges = {
+            0: { min: 0, max: 15 },   // Frequency
+            1: { min: 0, max: 79 },    // Duration
+            2: { min: 0, max: 4 },   // Severity
+            3: { min: 0, max: 112 }   // Extreme High Temp.
+        };
+
         var currentLayer, currentGeoRaster, currentBand = 0;
         const loadingDiv = document.getElementById('loading');
 
@@ -152,32 +163,34 @@
 
         // Add raster layer to the map and update the legend with color scale
         function addLayer(band) {
+            const steps = 10;
             if (!currentGeoRaster) return; // Abort if there is no data available.
 
-            // Determine color scale range.
-            const min = currentGeoRaster.mins[band];
-            const max = currentGeoRaster.maxs[band];
-
-            // Create color scale from red to orange ('OrRd') that spans from the calculated min to max values.
-            const scale = chroma.scale('OrRd').domain([min, max]);
-
-            // Update the 'legend' element to visually represent the color scale.
-            function updateLegend(min, max, scale) {
-                var legend = document.getElementById('legend');
-                legend.innerHTML = '<strong>Color Scale</strong><br>';
-                // Create gradient bar or discrete color steps
-                const steps = 10;
-                const range = max - min;
-                for (let i = 0; i <= steps; i++) {
-                    const value = min + i * (range / steps);
-                    const color = scale(value).hex();
-                    legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
-                }
-                // Append min and max labels below the color bar
-                legend.innerHTML += `<br><label>${min.toFixed(2)}</label><span style="float: right;">${max.toFixed(2)}</span>`;
+            // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
+            function getColor(value, band, steps) {
+                const { min, max } = bandRanges[band];
+                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
+                return scale(value).hex();
             }
 
-            updateLegend(min, max, scale);
+            // Update the 'legend' element to visually represent the color scale.
+            function updateLegend(band, steps) {
+                const { min, max } = bandRanges[band];
+                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
+
+                var legend = document.getElementById('legend');
+                legend.innerHTML = '<strong>Color Scale</strong><br>';
+
+                // Create gradient bar or discrete color steps
+                scale.colors(steps).forEach(color => {
+                    legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
+                });
+
+                // Append min and max labels below the color bar
+                legend.innerHTML += `<br><label>${min.toFixed(0)}</label><span style="float: right;">${max.toFixed(0)}</span>`;
+            }
+
+            updateLegend(band, steps);
 
             // Remove previous layer (if any)
             if (currentLayer) {
@@ -207,7 +220,7 @@
                     if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
                         return null;
                     }
-                    return scale(pixelValue).hex();
+                    return getColor(pixelValue, band, steps);
                 },
                 resolution: 256
             });
