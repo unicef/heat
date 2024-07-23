@@ -164,20 +164,22 @@
         // Add raster layer to the map and update the legend with color scale
         function addLayer(band) {
             const steps = 10;
+            const { min, max } = bandRanges[band];
+            const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
+            const colorLookup = scale.colors(steps); // Create a lookup table for colors
+
             if (!currentGeoRaster) return; // Abort if there is no data available.
 
             // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
-            function getColor(value, band, steps) {
-                const { min, max } = bandRanges[band];
-                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-                return scale(value).hex();
+            function getColor(value, min, max, steps, colorLookup) {
+                let clampedValue = Math.max(min, Math.min(max, value));
+                const index = Math.floor(((clampedValue - min) / (max - min)) * (steps - 1));
+                return colorLookup[index];
             }
 
             // Update the 'legend' element to visually represent the color scale.
-            function updateLegend(band, steps) {
-                const { min, max } = bandRanges[band];
+            function updateLegend(min, max, steps) {
                 const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-
                 var legend = document.getElementById('legend');
                 legend.innerHTML = '<strong>Color Scale</strong><br>';
 
@@ -190,7 +192,7 @@
                 legend.innerHTML += `<br><label>${min.toFixed(0)}</label><span style="float: right;">${max.toFixed(0)}</span>`;
             }
 
-            updateLegend(band, steps);
+            updateLegend(min, max, steps);
 
             // Remove previous layer (if any)
             if (currentLayer) {
@@ -220,7 +222,7 @@
                     if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
                         return null;
                     }
-                    return getColor(pixelValue, band, steps);
+                    return getColor(pixelValue, min, max, steps, colorLookup);
                 },
                 resolution: 256
             });
