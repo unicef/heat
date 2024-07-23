@@ -7,23 +7,40 @@
 
     <!-- Styles for the map and UI elements -->
     <style>
-        #map {
-            height: 600px;
-            width: 100%;
-        }
-
         #controls {
             margin: 10px;
         }
 
-        #legend {
-            background: white;
-            padding: 10px;
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
+        #map {
+            position: relative;
+            /* Add this to enable absolute positioning inside */
+            height: 600px;
+            width: 100%;
         }
+
+        #legend {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            padding: 10px;
+            background: white;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border: 1px solid #ccc;
+            margin-right: 5px;
+        }
+
+        .color-label {
+            display: inline-block;
+            font-size: 12px;
+        }
+
 
         @keyframes spin {
             0% {
@@ -92,10 +109,10 @@
                 <p style="text-align: center; margin-top: 10px;">Loading...</p>
             </div>
         </div>
-    </div>
 
-    <!-- define colourmap scale container -->
-    <div id="legend"></div>
+        <!-- define colourmap scale container -->
+        <div id="legend"></div>
+    </div>
 
     <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -163,7 +180,7 @@
 
         // Add raster layer to the map and update the legend with color scale
         function addLayer(band) {
-            const steps = 10;
+            const steps = 5;
             const { min, max } = bandRanges[band];
             const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
             const colorLookup = scale.colors(steps); // Create a lookup table for colors
@@ -183,13 +200,18 @@
                 var legend = document.getElementById('legend');
                 legend.innerHTML = '<strong>Color Scale</strong><br>';
 
-                // Create gradient bar or discrete color steps
-                scale.colors(steps).forEach(color => {
-                    legend.innerHTML += `<div style="background-color: ${color}; width: 20px; height: 20px; display: inline-block;"></div>`;
-                });
+                // Calculate the range step size
+                const stepSize = (max - min) / steps;
 
-                // Append min and max labels below the color bar
-                legend.innerHTML += `<br><label>${min.toFixed(0)}</label><span style="float: right;">${max.toFixed(0)}</span>`;
+                // Create the color blocks and labels
+                for (let i = 0; i < steps; i++) {
+                    const rangeMin = min + i * stepSize;
+                    const rangeMax = min + (i + 1) * stepSize;
+
+                    legend.innerHTML += `
+                        <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
+                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
+                }
             }
 
             updateLegend(min, max, steps);
