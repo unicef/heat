@@ -199,13 +199,21 @@
             const { min, max } = bandRanges[band];
             const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
             const colorLookup = scale.colors(steps); // Create a lookup table for colors
+            const overflowColor = '#500000';
 
             if (!currentGeoRaster) return; // Abort if there is no data available.
 
             // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
-            function getColor(value, min, max, steps, colorLookup) {
-                let clampedValue = Math.max(min, Math.min(max, value));
-                const index = Math.floor(((clampedValue - min) / (max - min)) * (steps - 1));
+            function getColor(value, min, max, steps, colorLookup, overflowColor) {
+                if (value > max) {
+                    // Return a specific color for values greater than max
+                    return overflowColor;
+                }
+
+                // Calculate the index for the color lookup
+                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+
+                // Return the color from the lookup
                 return colorLookup[index];
             }
 
@@ -227,6 +235,11 @@
                         <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
                         <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
                 }
+
+                // Add a new color box for values higher than the max
+                legend.innerHTML += `
+                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
+                    <label>${max}+</label><br>`;
             }
 
             updateLegend(min, max, steps);
@@ -259,7 +272,7 @@
                     if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
                         return null;
                     }
-                    return getColor(pixelValue, min, max, steps, colorLookup);
+                    return getColor(pixelValue, min, max, steps, colorLookup, overflowColor);
                 },
                 resolution: 256
             });
