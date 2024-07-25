@@ -20,7 +20,7 @@
     <!-- Website title -->
     <h1>Children Exposure to Heatwaves</h1>
 
-    <!-- Control panel for selecting sub-indicator and threshold-->
+    <!-- Control panel for selecting sub-indicator and threshold and download button-->
     <div id="controls">
         <label for="country">Country:</label>
         <select id="country">
@@ -40,6 +40,9 @@
             <option value="100%">100%</option>
             <option value="200%">200%</option>
         </select>
+
+        <!-- Button to download CSV -->
+        <button id="downloadBtn" style="margin-left: 10px;">Download CSV</button>
     </div>
 
     <!-- define map container -->
@@ -66,6 +69,7 @@
 
         var geojsonLayer;
         var geojsonData;
+        const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_population_geojson.geojson"
 
         function updateMap(selectedCountry, subIndicator, percentage) {
             if (geojsonLayer) {
@@ -128,7 +132,7 @@
         }
 
         // Load the GeoJSON file
-        fetch('../../input/child_population_geojson.geojson')
+        fetch(geojson_Url)
             .then(response => response.json())
             .then(data => {
                 geojsonData = data;
@@ -161,6 +165,11 @@
             updateMap(country, subIndicator, percentage);
         });
 
+        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries.csv'
+            window.open(csvUrl, '_blank');
+        });
     </script>
 </body>
 
