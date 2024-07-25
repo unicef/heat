@@ -45,6 +45,9 @@
     <!-- define map container -->
     <div id="map"></div>
 
+    <!-- Sum display -->
+    <div id="sum-display"></div>
+
     <!-- import necessary libraries -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
@@ -70,13 +73,26 @@
                 map.closePopup();
             }
 
+            var sum = 0;
+
             geojsonLayer = L.geoJson(geojsonData, {
                 onEachFeature: function (feature, layer) {
                     var countryName = feature.properties['Country Name'];
                     var value = feature.properties[subIndicator + " Increased by " + percentage];
 
+                    // Add to the sum if the value is defined and is a number
+                    if (value !== undefined && !isNaN(value)) {
+                        sum += value;
+                    }
+
                     // Create popup content
-                    var popupContent = "Country: " + countryName + "<br>" + subIndicator + " Increased by " + percentage + ": " + value;
+                    var popupContent = `
+                        <div class="popup-header">In <strong>${countryName}</strong></div>
+                        <div class="popup-content">
+                        <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s<br>
+                        </div>
+                    `;
+
                     layer.bindPopup(popupContent);
 
                     if (countryName === selectedCountry) {
@@ -86,6 +102,12 @@
                     }
                 }
             }).addTo(map);
+
+            // Display the sum below the map
+            var sumDisplay = document.getElementById('sum-display');
+            sumDisplay.innerHTML = `
+                Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
+            `;
         }
 
         function populateCountryOptions() {
@@ -111,7 +133,7 @@
             .then(data => {
                 geojsonData = data;
                 populateCountryOptions();
-                updateMap('Heatwave Frequency', '50%', '');
+                updateMap('', 'Heatwave Frequency', '50%');
             })
             .catch(error => {
                 console.error('Error loading the GeoJSON file:', error);
