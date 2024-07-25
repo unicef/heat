@@ -58,118 +58,121 @@
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 
     <script>
-        // initalize leaflet map
-        var map = L.map('map').setView([40, 0], 2);
+        (function () {
+            // initalize leaflet map
+            var map = L.map('map').setView([40, 0], 2);
 
-        // add OpenStreetMap basemap
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            noWrap: true,
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+            // add OpenStreetMap basemap
+            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                noWrap: true,
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
-        var geojsonLayer;
-        var geojsonData;
-        const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_population_geojson.geojson"
+            var geojsonLayer;
+            var geojsonData;
+            const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_population_geojson.geojson"
 
-        function updateMap(selectedCountry, subIndicator, percentage) {
-            if (geojsonLayer) {
-                map.removeLayer(geojsonLayer);
-                map.closePopup();
-            }
+            function updateMap(selectedCountry, subIndicator, percentage) {
+                if (geojsonLayer) {
+                    map.removeLayer(geojsonLayer);
+                    map.closePopup();
+                }
 
-            var sum = 0;
+                var sum = 0;
 
-            geojsonLayer = L.geoJson(geojsonData, {
-                onEachFeature: function (feature, layer) {
-                    var countryName = feature.properties['Country Name'];
-                    var value = feature.properties[subIndicator + " Increased by " + percentage];
+                geojsonLayer = L.geoJson(geojsonData, {
+                    onEachFeature: function (feature, layer) {
+                        var countryName = feature.properties['Country Name'];
+                        var value = feature.properties[subIndicator + " Increased by " + percentage];
 
-                    // Add to the sum if the value is defined and is a number
-                    if (value !== undefined && !isNaN(value)) {
-                        sum += value;
-                    }
+                        // Add to the sum if the value is defined and is a number
+                        if (value !== undefined && !isNaN(value)) {
+                            sum += value;
+                        }
 
-                    // Create popup content
-                    var popupContent = `
+                        // Create popup content
+                        var popupContent = `
                         <div class="popup-header">In <strong>${countryName}</strong></div>
                         <div class="popup-content">
                         <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s<br>
                         </div>
                     `;
 
-                    layer.bindPopup(popupContent);
+                        layer.bindPopup(popupContent);
 
-                    if (countryName === selectedCountry) {
-                        setTimeout(() => {
-                            layer.openPopup();
-                        }, 0);
+                        if (countryName === selectedCountry) {
+                            setTimeout(() => {
+                                layer.openPopup();
+                            }, 0);
+                        }
                     }
-                }
-            }).addTo(map);
+                }).addTo(map);
 
-            // Display the sum below the map
-            var sumDisplay = document.getElementById('sum-display');
-            sumDisplay.innerHTML = `
+                // Display the sum below the map
+                var sumDisplay = document.getElementById('sum-display');
+                sumDisplay.innerHTML = `
                 Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
             `;
-        }
+            }
 
-        function populateCountryOptions() {
-            var countrySelect = document.getElementById('country');
-            countrySelect.innerHTML = '<option value="">Select a country</option>';
-            var countries = [];
+            function populateCountryOptions() {
+                var countrySelect = document.getElementById('country');
+                countrySelect.innerHTML = '<option value="">Select a country</option>';
+                var countries = [];
 
-            geojsonData.features.forEach(function (feature) {
-                countries.push(feature.properties['Country Name']);
+                geojsonData.features.forEach(function (feature) {
+                    countries.push(feature.properties['Country Name']);
+                });
+
+                countries.sort().forEach(function (country) {
+                    var option = document.createElement('option');
+                    option.value = country;
+                    option.text = country;
+                    countrySelect.appendChild(option);
+                });
+            }
+
+            // Load the GeoJSON file
+            fetch(geojson_Url)
+                .then(response => response.json())
+                .then(data => {
+                    geojsonData = data;
+                    populateCountryOptions();
+                    updateMap('', 'Heatwave Frequency', '50%');
+                })
+                .catch(error => {
+                    console.error('Error loading the GeoJSON file:', error);
+                });
+
+            document.getElementById('country').addEventListener('change', function () {
+                var country = document.getElementById('country').value;
+                var subIndicator = document.getElementById('sub-indicator').value;
+                var percentage = document.getElementById('percentage').value;
+                updateMap(country, subIndicator, percentage);
             });
 
-            countries.sort().forEach(function (country) {
-                var option = document.createElement('option');
-                option.value = country;
-                option.text = country;
-                countrySelect.appendChild(option);
-            });
-        }
-
-        // Load the GeoJSON file
-        fetch(geojson_Url)
-            .then(response => response.json())
-            .then(data => {
-                geojsonData = data;
-                populateCountryOptions();
-                updateMap('', 'Heatwave Frequency', '50%');
-            })
-            .catch(error => {
-                console.error('Error loading the GeoJSON file:', error);
+            // Event listeners for the filters
+            document.getElementById('sub-indicator').addEventListener('change', function () {
+                var country = document.getElementById('country').value;
+                var subIndicator = document.getElementById('sub-indicator').value;
+                var percentage = document.getElementById('percentage').value;
+                updateMap(country, subIndicator, percentage);
             });
 
-        document.getElementById('country').addEventListener('change', function () {
-            var country = document.getElementById('country').value;
-            var subIndicator = document.getElementById('sub-indicator').value;
-            var percentage = document.getElementById('percentage').value;
-            updateMap(country, subIndicator, percentage);
-        });
+            document.getElementById('percentage').addEventListener('change', function () {
+                var country = document.getElementById('country').value;
+                var subIndicator = document.getElementById('sub-indicator').value;
+                var percentage = document.getElementById('percentage').value;
+                updateMap(country, subIndicator, percentage);
+            });
 
-        // Event listeners for the filters
-        document.getElementById('sub-indicator').addEventListener('change', function () {
-            var country = document.getElementById('country').value;
-            var subIndicator = document.getElementById('sub-indicator').value;
-            var percentage = document.getElementById('percentage').value;
-            updateMap(country, subIndicator, percentage);
-        });
+            // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+            document.getElementById('downloadBtn').addEventListener('click', function () {
+                var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries.csv'
+                window.open(csvUrl, '_blank');
+            });
 
-        document.getElementById('percentage').addEventListener('change', function () {
-            var country = document.getElementById('country').value;
-            var subIndicator = document.getElementById('sub-indicator').value;
-            var percentage = document.getElementById('percentage').value;
-            updateMap(country, subIndicator, percentage);
-        });
-
-        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-        document.getElementById('downloadBtn').addEventListener('click', function () {
-            var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries.csv'
-            window.open(csvUrl, '_blank');
-        });
+        })();
     </script>
 </body>
 

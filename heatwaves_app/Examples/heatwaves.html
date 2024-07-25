@@ -126,185 +126,187 @@
 
     <!-- Map initialization and control script -->
     <script>
-        var map = L.map('map', {
-            minZoom: 2,
-            maxZoom: 18,
-            maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
-            worldCopyJump: false // Prevents the map from wrapping around
-        }).setView([40, 0], 2);
+        (function () {
+            var map = L.map('map', {
+                minZoom: 2,
+                maxZoom: 18,
+                maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
+                worldCopyJump: false // Prevents the map from wrapping around
+            }).setView([40, 0], 2);
 
-        // Add Open Street Map layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            noWrap: true,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+            // Add Open Street Map layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                noWrap: true,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
-        // Searchbox to search by location
-        var geocoder = L.Control.geocoder({
-            defaultMarkGeocode: false
-        }).addTo(map);
+            // Searchbox to search by location
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false
+            }).addTo(map);
 
-        geocoder.on('markgeocode', function (e) {
-            var center = e.geocode.center;
-            map.setView(center, 4);
-        });
+            geocoder.on('markgeocode', function (e) {
+                var center = e.geocode.center;
+                map.setView(center, 4);
+            });
 
-        // URL storage for TIFF files, mapped by year
-        const tiffUrls = {
-            "1960": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1960s_proj_COG2.tif",
-            "1970": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1970s_proj_COG2.tif",
-            "1980": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1980s_proj_COG2.tif",
-            "1990": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1990s_proj_COG2.tif",
-            "2000": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2000s_proj_COG2.tif",
-            "2010": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2010s_proj_COG2.tif",
-            "2020": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj_COG2.tif"
-        };
+            // URL storage for TIFF files, mapped by year
+            const tiffUrls = {
+                "1960": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1960s_proj_COG2.tif",
+                "1970": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1970s_proj_COG2.tif",
+                "1980": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1980s_proj_COG2.tif",
+                "1990": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1990s_proj_COG2.tif",
+                "2000": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2000s_proj_COG2.tif",
+                "2010": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2010s_proj_COG2.tif",
+                "2020": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_2020s_proj_COG2.tif"
+            };
 
-        // Maximum and minimum values per band are determined by calculating the mean and standard deviation for 2020.
-        // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
-        // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
-        const bandRanges = {
-            0: { min: 0, max: 15 },   // Frequency
-            1: { min: 0, max: 79 },    // Duration
-            2: { min: 0, max: 4 },   // Severity
-            3: { min: 0, max: 112 }   // Extreme High Temp.
-        };
+            // Maximum and minimum values per band are determined by calculating the mean and standard deviation for 2020.
+            // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
+            // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
+            const bandRanges = {
+                0: { min: 0, max: 15 },   // Frequency
+                1: { min: 0, max: 79 },    // Duration
+                2: { min: 0, max: 4 },   // Severity
+                3: { min: 0, max: 112 }   // Extreme High Temp.
+            };
 
-        var currentLayer, currentGeoRaster, currentBand = 0;
-        const loadingDiv = document.getElementById('loading');
+            var currentLayer, currentGeoRaster, currentBand = 0;
+            const loadingDiv = document.getElementById('loading');
 
-        // Show or hide loading spinner accordingly
-        function toggleSpinner(show) {
-            loadingDiv.style.display = show ? 'block' : 'none';
-        }
-
-        // Load TIFF file for the selected year and handle it with GeoRaster
-        function loadTiffForYear(year) {
-            toggleSpinner(true);
-
-            fetch(tiffUrls[year])
-                .then(response => response.arrayBuffer())
-                .then(arrayBuffer => {
-                    parseGeoraster(arrayBuffer).then(georaster => {
-                        currentGeoRaster = georaster;
-                        addLayer(currentBand);
-                        toggleSpinner(false);
-                    });
-                })
-        }
-
-        // Add raster layer to the map and update the legend with color scale
-        function addLayer(band) {
-            const steps = 5;
-            const { min, max } = bandRanges[band];
-            const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-            const colorLookup = scale.colors(steps); // Create a lookup table for colors
-            const overflowColor = '#500000';
-
-            if (!currentGeoRaster) return; // Abort if there is no data available.
-
-            // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
-            function getColor(value, min, max, steps, colorLookup, overflowColor) {
-                if (value > max) {
-                    // Return a specific color for values greater than max
-                    return overflowColor;
-                }
-
-                // Calculate the index for the color lookup
-                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
-
-                // Return the color from the lookup
-                return colorLookup[index];
+            // Show or hide loading spinner accordingly
+            function toggleSpinner(show) {
+                loadingDiv.style.display = show ? 'block' : 'none';
             }
 
-            // Update the 'legend' element to visually represent the color scale.
-            function updateLegend(min, max, steps) {
+            // Load TIFF file for the selected year and handle it with GeoRaster
+            function loadTiffForYear(year) {
+                toggleSpinner(true);
+
+                fetch(tiffUrls[year])
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => {
+                        parseGeoraster(arrayBuffer).then(georaster => {
+                            currentGeoRaster = georaster;
+                            addLayer(currentBand);
+                            toggleSpinner(false);
+                        });
+                    })
+            }
+
+            // Add raster layer to the map and update the legend with color scale
+            function addLayer(band) {
+                const steps = 5;
+                const { min, max } = bandRanges[band];
                 const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-                var legend = document.getElementById('legend');
-                legend.innerHTML = '<strong>Color Scale</strong><br>';
+                const colorLookup = scale.colors(steps); // Create a lookup table for colors
+                const overflowColor = '#500000';
 
-                // Calculate the range step size
-                const stepSize = (max - min) / steps;
+                if (!currentGeoRaster) return; // Abort if there is no data available.
 
-                // Create the color blocks and labels
-                for (let i = 0; i < steps; i++) {
-                    const rangeMin = min + i * stepSize;
-                    const rangeMax = min + (i + 1) * stepSize;
+                // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
+                function getColor(value, min, max, steps, colorLookup, overflowColor) {
+                    if (value > max) {
+                        // Return a specific color for values greater than max
+                        return overflowColor;
+                    }
 
-                    legend.innerHTML += `
+                    // Calculate the index for the color lookup
+                    const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+
+                    // Return the color from the lookup
+                    return colorLookup[index];
+                }
+
+                // Update the 'legend' element to visually represent the color scale.
+                function updateLegend(min, max, steps) {
+                    const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
+                    var legend = document.getElementById('legend');
+                    legend.innerHTML = '<strong>Color Scale</strong><br>';
+
+                    // Calculate the range step size
+                    const stepSize = (max - min) / steps;
+
+                    // Create the color blocks and labels
+                    for (let i = 0; i < steps; i++) {
+                        const rangeMin = min + i * stepSize;
+                        const rangeMax = min + (i + 1) * stepSize;
+
+                        legend.innerHTML += `
                         <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
                         <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
-                }
+                    }
 
-                // Add a new color box for values higher than the max
-                legend.innerHTML += `
+                    // Add a new color box for values higher than the max
+                    legend.innerHTML += `
                     <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
                     <label>${max}+</label><br>`;
+                }
+
+                updateLegend(min, max, steps);
+
+                // Remove previous layer (if any)
+                if (currentLayer) {
+                    map.removeLayer(currentLayer);
+                }
+
+                // Add new GeoRaster layer
+                currentLayer = new GeoRasterLayer({
+                    attribution: "Unicef",
+                    noWrap: true, // Prevents from repeating the map at the edges.
+                    georaster: currentGeoRaster,
+                    opacity: 0.7,
+                    // Handle the loading spinner.
+                    onTileLoadStart: function () {
+                        toggleSpinner(true);
+                    },
+                    onTileLoadEnd: function () {
+                        toggleSpinner(false);
+                    },
+                    onTileLoadError: function () {
+                        toggleSpinner(false);
+                        alert('Failed to load data. Please try again.');
+                    },
+                    // Assign colors to individual pixels based on their value
+                    pixelValuesToColorFn: function (pixelValues) {
+                        var pixelValue = pixelValues[band];
+                        if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
+                            return null;
+                        }
+                        return getColor(pixelValue, min, max, steps, colorLookup, overflowColor);
+                    },
+                    resolution: 256
+                });
+                // Display the layer on the map
+                currentLayer.addTo(map);
+                // Adjust the map's view to fit the bounds of the newly added raster layer.
+                map.fitBounds(currentLayer.getBounds());
             }
 
-            updateLegend(min, max, steps);
+            // Initial load
+            loadTiffForYear(document.getElementById('yearDropdown').value);
 
-            // Remove previous layer (if any)
-            if (currentLayer) {
-                map.removeLayer(currentLayer);
-            }
+            // Event listeners for dropdown changes and button clicks
 
-            // Add new GeoRaster layer
-            currentLayer = new GeoRasterLayer({
-                attribution: "Unicef",
-                noWrap: true, // Prevents from repeating the map at the edges.
-                georaster: currentGeoRaster,
-                opacity: 0.7,
-                // Handle the loading spinner.
-                onTileLoadStart: function () {
-                    toggleSpinner(true);
-                },
-                onTileLoadEnd: function () {
-                    toggleSpinner(false);
-                },
-                onTileLoadError: function () {
-                    toggleSpinner(false);
-                    alert('Failed to load data. Please try again.');
-                },
-                // Assign colors to individual pixels based on their value
-                pixelValuesToColorFn: function (pixelValues) {
-                    var pixelValue = pixelValues[band];
-                    if (pixelValue === 0 || pixelValue === null || pixelValue === undefined || isNaN(pixelValue)) {
-                        return null;
-                    }
-                    return getColor(pixelValue, min, max, steps, colorLookup, overflowColor);
-                },
-                resolution: 256
+            // Listen for a change event on the 'yearDropdown' element and call the loadTiffForYear with the newly selected year.
+            document.getElementById('yearDropdown').addEventListener('change', function () {
+                var selectedYear = this.value;
+                loadTiffForYear(selectedYear);
             });
-            // Display the layer on the map
-            currentLayer.addTo(map);
-            // Adjust the map's view to fit the bounds of the newly added raster layer.
-            map.fitBounds(currentLayer.getBounds());
-        }
 
-        // Initial load
-        loadTiffForYear(document.getElementById('yearDropdown').value);
+            // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band.
+            document.getElementById('bandSelector').addEventListener('change', function (event) {
+                currentBand = parseInt(event.target.value);
+                addLayer(currentBand);
+            });
 
-        // Event listeners for dropdown changes and button clicks
+            // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+            document.getElementById('downloadBtn').addEventListener('click', function () {
+                var year = document.getElementById('yearDropdown').value;
+                window.open(tiffUrls[year], '_blank');
+            });
 
-        // Listen for a change event on the 'yearDropdown' element and call the loadTiffForYear with the newly selected year.
-        document.getElementById('yearDropdown').addEventListener('change', function () {
-            var selectedYear = this.value;
-            loadTiffForYear(selectedYear);
-        });
-
-        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band.
-        document.getElementById('bandSelector').addEventListener('change', function (event) {
-            currentBand = parseInt(event.target.value);
-            addLayer(currentBand);
-        });
-
-        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-        document.getElementById('downloadBtn').addEventListener('click', function () {
-            var year = document.getElementById('yearDropdown').value;
-            window.open(tiffUrls[year], '_blank');
-        });
-
+        })();
     </script>
 </body>
 
