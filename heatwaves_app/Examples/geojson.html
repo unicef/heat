@@ -2,14 +2,20 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UNICEF Children's Exposure</title>
+
+    <!-- Leaflet CSS for map styling -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 
     <!-- Styles for the map and UI elements -->
     <style>
+        #controls {
+            margin: 10px;
+        }
+
         #map {
-            position: relative;
-            /* Add this to enable absolute positioning inside */
             height: 600px;
             width: 100%;
         }
@@ -18,14 +24,15 @@
 
 <body>
     <!-- Website title -->
-    <h1>Children Exposure to Heatwaves</h1>
+    <h1>Children's Exposure to Heatwaves</h1>
 
-    <!-- Control panel for selecting sub-indicator and threshold and download button-->
+    <!-- Control panel for selecting country, sub-indicator, percentage increase, and download button-->
     <div id="controls">
         <label for="country">Country:</label>
         <select id="country">
             <!-- Options will be populated dynamically -->
         </select>
+
         <label for="sub-indicator">Select sub-indicator:</label>
         <select id="sub-indicator">
             <option value="Heatwave Frequency">Frequency</option>
@@ -45,20 +52,20 @@
         <button id="downloadBtn" style="margin-left: 10px;">Download CSV</button>
     </div>
 
-    <!-- define map container -->
+    <!-- Map container -->
     <div id="map"></div>
 
     <!-- Sum display -->
     <div id="sum-display"></div>
 
-    <!-- import necessary libraries -->
+    <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 
     <script>
-        (function () {
+        (function () { // This is to be able to embed the script into the index.html
             // initalize leaflet map
             var map = L.map('map').setView([40, 0], 2);
 
@@ -72,20 +79,21 @@
             var geojsonData;
             const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_population_geojson.geojson"
 
+            // Function to update the map based on selected filters
             function updateMap(selectedCountry, subIndicator, percentage) {
                 if (geojsonLayer) {
                     map.removeLayer(geojsonLayer);
                     map.closePopup();
                 }
 
-                var sum = 0;
+                var sum = 0; // For global statistics
 
                 geojsonLayer = L.geoJson(geojsonData, {
                     onEachFeature: function (feature, layer) {
                         var countryName = feature.properties['Country Name'];
                         var value = feature.properties[subIndicator + " Increased by " + percentage];
 
-                        // Add to the sum if the value is defined and is a number
+                        // Add to the global sum if the value is defined and is a number
                         if (value !== undefined && !isNaN(value)) {
                             sum += value;
                         }
@@ -94,13 +102,14 @@
                         var popupContent = `
                         <div class="popup-header">In <strong>${countryName}</strong></div>
                         <div class="popup-content">
-                        <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s<br>
+                            <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s<br>
                         </div>
                     `;
 
                         layer.bindPopup(popupContent);
 
                         if (countryName === selectedCountry) {
+                            // Use setTimeout to ensure the popup opens after the layer has been added to the map
                             setTimeout(() => {
                                 layer.openPopup();
                             }, 0);
@@ -111,24 +120,33 @@
                 // Display the sum below the map
                 var sumDisplay = document.getElementById('sum-display');
                 sumDisplay.innerHTML = `
-                Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
-            `;
+                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
+                `;
             }
 
+            // Populate country options dynamically
             function populateCountryOptions() {
+                // Get the select element for countries
                 var countrySelect = document.getElementById('country');
+
+                // Set the initial option to prompt the user to select a country
                 countrySelect.innerHTML = '<option value="">Select a country</option>';
+
+                // Create an empty array to store country names
                 var countries = [];
 
+                // Iterate over each feature in the GeoJSON data
                 geojsonData.features.forEach(function (feature) {
+                    // Extract the country name from the feature properties and add it to the countries array
                     countries.push(feature.properties['Country Name']);
                 });
 
+                // Sort the country names alphabetically
                 countries.sort().forEach(function (country) {
-                    var option = document.createElement('option');
-                    option.value = country;
-                    option.text = country;
-                    countrySelect.appendChild(option);
+                    var option = document.createElement('option'); // Create a new option element for each country
+                    option.value = country; // Set the value attribute to the country name
+                    option.text = country; // Set the displayed text to the country name
+                    countrySelect.appendChild(option); // Append the option element to the country select element
                 });
             }
 
@@ -144,6 +162,7 @@
                     console.error('Error loading the GeoJSON file:', error);
                 });
 
+            // Event listeners for the filters
             document.getElementById('country').addEventListener('change', function () {
                 var country = document.getElementById('country').value;
                 var subIndicator = document.getElementById('sub-indicator').value;
@@ -151,7 +170,6 @@
                 updateMap(country, subIndicator, percentage);
             });
 
-            // Event listeners for the filters
             document.getElementById('sub-indicator').addEventListener('change', function () {
                 var country = document.getElementById('country').value;
                 var subIndicator = document.getElementById('sub-indicator').value;
