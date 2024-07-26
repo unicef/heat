@@ -2,8 +2,13 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Heatwave Indicators</title>
+
+    <!-- Leaflet CSS for map styling -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <!-- Styles for the map and UI elements -->
     <style>
@@ -13,7 +18,6 @@
 
         #map {
             position: relative;
-            /* Add this to enable absolute positioning inside */
             height: 600px;
             width: 100%;
         }
@@ -24,23 +28,7 @@
             right: 15px;
             padding: 10px;
             background: white;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            display: inline-block;
         }
-
-        .color-box {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
-            border: 1px solid #ccc;
-            margin-right: 5px;
-        }
-
-        .color-label {
-            display: inline-block;
-            font-size: 12px;
-        }
-
 
         @keyframes spin {
             0% {
@@ -68,7 +56,7 @@
             width: 50px;
             height: 50px;
             border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            border-top: 5px solid #1cabe2;
             border-radius: 50%;
             animation: spin 2s linear infinite;
         }
@@ -91,6 +79,7 @@
             <option value="2010">2010</option>
             <option value="2020">2020</option>
         </select>
+
         <label for="bandSelector">Select sub-indicator:</label>
         <select id="bandSelector">
             <option value="0">Frequency</option>
@@ -98,12 +87,13 @@
             <option value="2">Severity</option>
             <option value="3">Extreme High Temp.</option>
         </select>
+
         <button id="downloadBtn" style="margin-left: 10px;">Download TIF</button>
     </div>
 
-    <!-- define map container -->
+    <!-- Map container -->
     <div id="map">
-        <!-- define loading message container -->
+        <!-- Loading message container -->
         <div id="loading">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
                 <div class="spinner"></div>
@@ -111,26 +101,23 @@
             </div>
         </div>
 
-        <!-- define colourmap scale container -->
+        <!-- Color scale legend container -->
         <div id="legend"></div>
     </div>
 
-    <!-- import necessary libraries -->
+    <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
-    <!-- plugin to search by location -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <!-- Map initialization and control script -->
     <script>
-        (function () {
+        (function () { // This is to be able to embed the script into the index.html
+            // initalize leaflet map
             var map = L.map('map', {
                 minZoom: 2,
                 maxZoom: 18,
-                maxBounds: [[-90, -180], [90, 180]], // Restricts panning to the extent of the world
                 worldCopyJump: false // Prevents the map from wrapping around
             }).setView([40, 0], 2);
 
@@ -150,7 +137,7 @@
                 map.setView(center, 4);
             });
 
-            // URL storage for TIFF files, mapped by year
+            // URLs for TIFF files by year
             const tiffUrls = {
                 "1960": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1960s_proj_COG2.tif",
                 "1970": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/average_hwi_1970s_proj_COG2.tif",
@@ -174,24 +161,48 @@
             var currentLayer, currentGeoRaster, currentBand = 0;
             const loadingDiv = document.getElementById('loading');
 
-            // Show or hide loading spinner accordingly
+            // Helper function to show or hide loading spinner
             function toggleSpinner(show) {
                 loadingDiv.style.display = show ? 'block' : 'none';
             }
 
-            // Load TIFF file for the selected year and handle it with GeoRaster
-            function loadTiffForYear(year) {
-                toggleSpinner(true);
+            // Helper function to get color based on value
+            // values higher than the max of the selected band are clamped to the darkest color (to prevent outliers from skewing the perceptual scaling of data).
+            function getColor(value, min, max, steps, colorLookup, overflowColor) {
+                if (value > max) {
+                    // Return a specific color for values greater than max
+                    return overflowColor;
+                }
 
-                fetch(tiffUrls[year])
-                    .then(response => response.arrayBuffer())
-                    .then(arrayBuffer => {
-                        parseGeoraster(arrayBuffer).then(georaster => {
-                            currentGeoRaster = georaster;
-                            addLayer(currentBand);
-                            toggleSpinner(false);
-                        });
-                    })
+                // Calculate the index for the color lookup
+                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+
+                // Return the color from the lookup
+                return colorLookup[index];
+            }
+
+            // Helper function to update the legend with color scale
+            function updateLegend(min, max, steps, scale, overflowColor) {
+                var legend = document.getElementById('legend');
+                legend.innerHTML = '<strong>Color Scale</strong><br>';
+
+                // Calculate the range step size
+                const stepSize = (max - min) / steps;
+
+                // Create the color blocks and labels
+                for (let i = 0; i < steps; i++) {
+                    const rangeMin = min + i * stepSize;
+                    const rangeMax = min + (i + 1) * stepSize;
+
+                    legend.innerHTML += `
+                        <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
+                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
+                }
+
+                // Add a new color box for values higher than the max
+                legend.innerHTML += `
+                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
+                    <label>${max}+</label><br>`;
             }
 
             // Add raster layer to the map and update the legend with color scale
@@ -204,46 +215,7 @@
 
                 if (!currentGeoRaster) return; // Abort if there is no data available.
 
-                // Get color based on the value, clamping it to the min and max of the selected band (to prevent outliers from skewing the perceptual scaling of data).
-                function getColor(value, min, max, steps, colorLookup, overflowColor) {
-                    if (value > max) {
-                        // Return a specific color for values greater than max
-                        return overflowColor;
-                    }
-
-                    // Calculate the index for the color lookup
-                    const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
-
-                    // Return the color from the lookup
-                    return colorLookup[index];
-                }
-
-                // Update the 'legend' element to visually represent the color scale.
-                function updateLegend(min, max, steps) {
-                    const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-                    var legend = document.getElementById('legend');
-                    legend.innerHTML = '<strong>Color Scale</strong><br>';
-
-                    // Calculate the range step size
-                    const stepSize = (max - min) / steps;
-
-                    // Create the color blocks and labels
-                    for (let i = 0; i < steps; i++) {
-                        const rangeMin = min + i * stepSize;
-                        const rangeMax = min + (i + 1) * stepSize;
-
-                        legend.innerHTML += `
-                        <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
-                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
-                    }
-
-                    // Add a new color box for values higher than the max
-                    legend.innerHTML += `
-                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
-                    <label>${max}+</label><br>`;
-                }
-
-                updateLegend(min, max, steps);
+                updateLegend(min, max, steps, scale, overflowColor);
 
                 // Remove previous layer (if any)
                 if (currentLayer) {
@@ -281,6 +253,25 @@
                 currentLayer.addTo(map);
                 // Adjust the map's view to fit the bounds of the newly added raster layer.
                 map.fitBounds(currentLayer.getBounds());
+            }
+
+            // Load the TIFF file for the selected year
+            function loadTiffForYear(year) {
+                toggleSpinner(true);
+
+                fetch(tiffUrls[year])
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => {
+                        parseGeoraster(arrayBuffer).then(georaster => {
+                            currentGeoRaster = georaster;
+                            addLayer(currentBand);
+                            toggleSpinner(false);
+                        });
+                    })
+                    .catch(() => {
+                        toggleSpinner(false);
+                        alert('Failed to load data. Please try again.');
+                    });
             }
 
             // Initial load
