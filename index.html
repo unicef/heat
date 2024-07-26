@@ -3,15 +3,103 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Redirecting...</title>
-    <script>
-        window.location.href = "heatwaves_app/Examples/heatwaves.html";
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UNICEF Children's Exposure to Heatwaves</title>
+
+    <!-- Leaflet CSS for map styling -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: #1cabe2;
+            padding: 30px;
+        }
+
+        .header img {
+            height: 25px;
+        }
+
+        .content-wrapper {
+            padding: 20px;
+        }
+
+        #content {
+            margin-top: 20px;
+        }
+
+        .custom-button {
+            background-color: #FFFFFF;
+            border: none;
+            color: #000000;
+            cursor: pointer;
+        }
+
+        .custom-button:hover,
+        .custom-button:focus {
+            background-color: #FFFFFF;
+            border: none;
+            color: #1cabe2;
+        }
+    </style>
+
 </head>
 
 <body>
-    <p>If you are not redirected automatically, please <a href="heatwaves_app/Examples/heatwaves.html">click here</a>.
-    </p>
+    <!-- Header section with UNICEF logo -->
+    <div class="header">
+        <img src="https://unicefdownloadfiletest.blob.core.windows.net/prueba/unicef-logo.webp" alt="UNICEF Logo">
+    </div>
+
+    <!-- Content wrapper with buttons and content div -->
+    <div class="content-wrapper">
+        <!-- Buttons to load different pages -->
+        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/heatwaves.html')">Climate
+            Indicators</button>
+        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/geojson.html')">Children's
+            Exposure</button>
+        <div id="content">
+            <!-- The selected page will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Import necessary scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/georaster"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
+    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <script>
+        // Function to load a page into the content div
+        function loadPage(page) {
+            fetch(page)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('content').innerHTML = data;
+                    executeScripts(); // Execute any scripts in the loaded page
+                });
+        }
+
+        // Function to execute scripts in the loaded page content
+        function executeScripts() {
+            const scripts = document.querySelectorAll('#content script');
+            scripts.forEach(script => {
+                const newScript = document.createElement('script');
+                newScript.textContent = script.textContent;
+                document.body.appendChild(newScript);
+                document.body.removeChild(newScript); // Remove after execution to avoid duplication
+            });
+        }
+
+        // Load the first page by default when the page loads
+        window.onload = function () {
+            loadPage('heatwaves_app/Examples/heatwaves.html');
+        }
+    </script>
+
 </body>
 
 </html>
