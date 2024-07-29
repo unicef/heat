@@ -25,9 +25,10 @@
         #legend {
             position: absolute;
             bottom: 15px;
-            right: 15px;
+            right: 40px;
             padding: 10px;
             background: white;
+            z-index: 1001;
         }
 
         @keyframes spin {
@@ -59,6 +60,10 @@
             border-top: 5px solid #1cabe2;
             border-radius: 50%;
             animation: spin 2s linear infinite;
+        }
+
+        .leaflet-container {
+            background-color: rgba(255, 0, 0, 0.0);
         }
     </style>
 </head>
@@ -102,10 +107,10 @@
                 <p style="text-align: center; margin-top: 10px;">Loading...</p>
             </div>
         </div>
-
-        <!-- Color scale legend container -->
-        <div id="legend"></div>
     </div>
+
+    <!-- Color scale legend container -->
+    <div id="legend"></div>
 
     <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
