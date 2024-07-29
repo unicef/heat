@@ -31,13 +31,8 @@
     <!-- Website title -->
     <h1>Children's Exposure to Heatwaves</h1>
 
-    <!-- Control panel for selecting country, sub-indicator, percentage increase, and download button-->
+    <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
-        <label for="country">Country:</label>
-        <select id="country">
-            <!-- Options will be populated dynamically -->
-        </select>
-
         <label for="sub-indicator">Select sub-indicator:</label>
         <select id="sub-indicator">
             <option value="Heatwave Frequency">Frequency</option>
@@ -103,7 +98,7 @@
             const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023.geojson"
 
             // Function to update the map based on selected filters
-            function updateMap(selectedCountry, subIndicator, percentage) {
+            function updateMap(subIndicator, percentage) {
                 if (geojsonLayer) {
                     map.removeLayer(geojsonLayer);
                     map.closePopup();
@@ -130,13 +125,6 @@
                     `;
 
                         layer.bindPopup(popupContent);
-
-                        if (countryName === selectedCountry) {
-                            // Use setTimeout to ensure the popup opens after the layer has been added to the map
-                            setTimeout(() => {
-                                layer.openPopup();
-                            }, 0);
-                        }
                     }
                 }).addTo(map);
 
@@ -146,65 +134,28 @@
                     Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
                 `;
             }
-
-            // Populate country options dynamically
-            function populateCountryOptions() {
-                // Get the select element for countries
-                var countrySelect = document.getElementById('country');
-
-                // Set the initial option to prompt the user to select a country
-                countrySelect.innerHTML = '<option value="">Select a country</option>';
-
-                // Create an empty array to store country names
-                var countries = [];
-
-                // Iterate over each feature in the GeoJSON data
-                geojsonData.features.forEach(function (feature) {
-                    // Extract the country name from the feature properties and add it to the countries array
-                    countries.push(feature.properties['Country Name']);
-                });
-
-                // Sort the country names alphabetically
-                countries.sort().forEach(function (country) {
-                    var option = document.createElement('option'); // Create a new option element for each country
-                    option.value = country; // Set the value attribute to the country name
-                    option.text = country; // Set the displayed text to the country name
-                    countrySelect.appendChild(option); // Append the option element to the country select element
-                });
-            }
-
             // Load the GeoJSON file
             fetch(geojson_Url)
                 .then(response => response.json())
                 .then(data => {
                     geojsonData = data;
-                    populateCountryOptions();
-                    updateMap('', 'Heatwave Frequency', '50%');
+                    updateMap('Heatwave Frequency', '50%');
                 })
                 .catch(error => {
                     console.error('Error loading the GeoJSON file:', error);
                 });
 
             // Event listeners for the filters
-            document.getElementById('country').addEventListener('change', function () {
-                var country = document.getElementById('country').value;
-                var subIndicator = document.getElementById('sub-indicator').value;
-                var percentage = document.getElementById('percentage').value;
-                updateMap(country, subIndicator, percentage);
-            });
-
             document.getElementById('sub-indicator').addEventListener('change', function () {
-                var country = document.getElementById('country').value;
                 var subIndicator = document.getElementById('sub-indicator').value;
                 var percentage = document.getElementById('percentage').value;
-                updateMap(country, subIndicator, percentage);
+                updateMap(subIndicator, percentage);
             });
 
             document.getElementById('percentage').addEventListener('change', function () {
-                var country = document.getElementById('country').value;
                 var subIndicator = document.getElementById('sub-indicator').value;
                 var percentage = document.getElementById('percentage').value;
-                updateMap(country, subIndicator, percentage);
+                updateMap(subIndicator, percentage);
             });
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
