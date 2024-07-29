@@ -20,6 +20,10 @@
             height: 600px;
             width: 100%;
         }
+
+        .leaflet-container {
+            background-color: rgba(255, 0, 0, 0.0);
+        }
     </style>
 </head>
 
@@ -96,7 +100,7 @@
 
             var geojsonLayer;
             var geojsonData;
-            const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_population_geojson.geojson"
+            const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023.geojson"
 
             // Function to update the map based on selected filters
             function updateMap(selectedCountry, subIndicator, percentage) {
@@ -205,7 +209,7 @@
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
             document.getElementById('downloadBtn').addEventListener('click', function () {
-                var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries.csv'
+                var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries_2023.csv'
                 window.open(csvUrl, '_blank');
             });
 
