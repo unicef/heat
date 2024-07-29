@@ -60,9 +60,9 @@
     <!-- Content wrapper with buttons and content div -->
     <div class="content-wrapper">
         <!-- Buttons to load different pages -->
-        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/heatwaves.html', this)">Climate
+        <button class="custom-button" onclick="loadPage('visualization/heatwaves.html', this)">Climate
             Indicators</button>
-        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/geojson.html', this)">Children's
+        <button class="custom-button" onclick="loadPage('visualization/childexposure.html', this)">Children's
             Exposure</button>
         <div id="content">
             <!-- The selected page will be loaded here -->
@@ -109,7 +109,7 @@
         // Load the first page by default when the page loads
         window.onload = function () {
             const defaultButton = document.querySelector('.custom-button');
-            loadPage('heatwaves_app/Examples/heatwaves.html', defaultButton);
+            loadPage('visualization/heatwaves.html', defaultButton);
         }
     </script>
 
