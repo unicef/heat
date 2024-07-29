@@ -33,6 +33,12 @@
 
     <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
+        <label for="yearDropdown">Select year:</label>
+        <select id="yearDropdown" disabled>
+            <option value="2023">2023</option>
+            <!-- Future options for other years can be added here -->
+        </select>
+
         <label for="sub-indicator">Select sub-indicator:</label>
         <select id="sub-indicator">
             <option value="Heatwave Frequency">Frequency</option>
@@ -95,7 +101,10 @@
 
             var geojsonLayer;
             var geojsonData;
-            const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023.geojson"
+            var currentYear = "2023";
+
+            // URLs for geojson files by year
+            const geojsonUrls = { "2023": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023.geojson" };
 
             // Function to update the map based on selected filters
             function updateMap(subIndicator, percentage) {
@@ -134,33 +143,53 @@
                     Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
                 `;
             }
-            // Load the GeoJSON file
-            fetch(geojson_Url)
-                .then(response => response.json())
-                .then(data => {
-                    geojsonData = data;
-                    updateMap('Heatwave Frequency', '50%');
-                })
-                .catch(error => {
-                    console.error('Error loading the GeoJSON file:', error);
-                });
+
+            // Load the GeoJSON file for the selected year
+            function loadGeojsonForYear(year, callback) {
+                fetch(geojsonUrls[year])
+                    .then(response => response.json())
+                    .then(data => {
+                        geojsonData = data;
+                        if (callback) callback();
+                    })
+                    .catch(error => {
+                        console.error('Error loading the GeoJSON file:', error);
+                    });
+            }
+
+            // Initial load
+            loadGeojsonForYear(currentYear, function () {
+                updateMap('Heatwave Frequency', '50%');
+            });
 
             // Event listeners for the filters
+            document.getElementById('yearDropdown').addEventListener('change', function () {
+                var selectedYear = this.value;
+                if (selectedYear !== currentYear) {
+                    currentYear = selectedYear;
+                    loadGeojsonForYear(currentYear, function () {
+                        var subIndicator = document.getElementById('sub-indicator').value;
+                        var percentage = document.getElementById('percentage').value;
+                        updateMap(subIndicator, percentage);
+                    });
+                }
+            });
             document.getElementById('sub-indicator').addEventListener('change', function () {
-                var subIndicator = document.getElementById('sub-indicator').value;
+                var subIndicator = this.value;
                 var percentage = document.getElementById('percentage').value;
                 updateMap(subIndicator, percentage);
             });
 
             document.getElementById('percentage').addEventListener('change', function () {
                 var subIndicator = document.getElementById('sub-indicator').value;
-                var percentage = document.getElementById('percentage').value;
+                var percentage = this.value;
                 updateMap(subIndicator, percentage);
             });
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
             document.getElementById('downloadBtn').addEventListener('click', function () {
-                var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries_2023.csv'
+                var selectedYear = document.getElementById('yearDropdown').value;
+                var csvUrl = `https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries_${selectedYear}.csv`;
                 window.open(csvUrl, '_blank');
             });
 
