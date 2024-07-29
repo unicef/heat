@@ -43,6 +43,10 @@
             border: none;
             color: #1cabe2;
         }
+
+        .custom-button.active {
+            color: #1cabe2;
+        }
     </style>
 
 </head>
@@ -56,9 +60,9 @@
     <!-- Content wrapper with buttons and content div -->
     <div class="content-wrapper">
         <!-- Buttons to load different pages -->
-        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/heatwaves.html')">Climate
+        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/heatwaves.html', this)">Climate
             Indicators</button>
-        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/geojson.html')">Children's
+        <button class="custom-button" onclick="loadPage('heatwaves_app/Examples/geojson.html', this)">Children's
             Exposure</button>
         <div id="content">
             <!-- The selected page will be loaded here -->
@@ -74,7 +78,15 @@
 
     <script>
         // Function to load a page into the content div
-        function loadPage(page) {
+        function loadPage(page, button) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.custom-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Add active class to clicked button
+            button.classList.add('active');
+
             fetch(page)
                 .then(response => response.text())
                 .then(data => {
@@ -96,7 +108,8 @@
 
         // Load the first page by default when the page loads
         window.onload = function () {
-            loadPage('heatwaves_app/Examples/heatwaves.html');
+            const defaultButton = document.querySelector('.custom-button');
+            loadPage('heatwaves_app/Examples/heatwaves.html', defaultButton);
         }
     </script>
 
