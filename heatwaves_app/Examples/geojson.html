@@ -8,6 +8,7 @@
 
     <!-- Leaflet CSS for map styling -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
     <!-- Styles for the map and UI elements -->
     <style>
@@ -48,8 +49,9 @@
             <option value="200%">200%</option>
         </select>
 
-        <!-- Button to download CSV -->
+        <!-- Button to download CSV and reset map view -->
         <button id="downloadBtn" style="margin-left: 10px;">Download CSV</button>
+        <button id="reset-view">Reset View</button>
     </div>
 
     <!-- Map container -->
@@ -63,17 +65,34 @@
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
         (function () { // This is to be able to embed the script into the index.html
             // initalize leaflet map
-            var map = L.map('map').setView([40, 0], 2);
+            var defaultView = [40, 0];
+            var defaultZoom = 2;
+            var map = L.map('map', {
+                minZoom: 2,
+                maxZoom: 18,
+                worldCopyJump: false // Prevents the map from wrapping around
+            }).setView(defaultView, defaultZoom);
 
             // add OpenStreetMap basemap
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 noWrap: true,
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
+
+            // Searchbox to search by location
+            var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false
+            }).addTo(map);
+
+            geocoder.on('markgeocode', function (e) {
+                var center = e.geocode.center;
+                map.setView(center, 4);
+            });
 
             var geojsonLayer;
             var geojsonData;
@@ -188,6 +207,11 @@
             document.getElementById('downloadBtn').addEventListener('click', function () {
                 var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries.csv'
                 window.open(csvUrl, '_blank');
+            });
+
+            // Event listener for reset view button click
+            document.getElementById('reset-view').addEventListener('click', function () {
+                map.setView(defaultView, defaultZoom);
             });
 
         })();
