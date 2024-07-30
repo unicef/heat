@@ -21,6 +21,37 @@
             width: 100%;
         }
 
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+
+        .spinner {
+            margin: 0 auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1cabe2;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
         .leaflet-container {
             background-color: rgba(255, 0, 0, 0.0);
         }
@@ -33,6 +64,12 @@
 
     <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
+        <label for="yearDropdown">Year of the report:</label>
+        <select id="yearDropdown" disabled>
+            <option value="2023">2023</option>
+            <!-- Future options for other years can be added here -->
+        </select>
+
         <label for="sub-indicator">Select sub-indicator:</label>
         <select id="sub-indicator">
             <option value="Heatwave Frequency">Frequency</option>
@@ -54,7 +91,15 @@
     </div>
 
     <!-- Map container -->
-    <div id="map"></div>
+    <div id="map">
+        <!-- Loading message container -->
+        <div id="loading">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="spinner"></div>
+                <p style="text-align: center; margin-top: 10px;">Loading...</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Sum display -->
     <div id="sum-display"></div>
@@ -95,7 +140,17 @@
 
             var geojsonLayer;
             var geojsonData;
-            const geojson_Url = "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023.geojson"
+            var currentYear = "2023";
+
+            // URLs for geojson files by year
+            const geojsonUrls = { "2023": "https://unicefstorage.blob.core.windows.net/hwstorage/child_exposure_2023_unicef.geojson" };
+
+            const loadingDiv = document.getElementById('loading');
+
+            // Helper function to show or hide loading spinner
+            function toggleSpinner(show) {
+                loadingDiv.style.display = show ? 'block' : 'none';
+            }
 
             // Function to update the map based on selected filters
             function updateMap(subIndicator, percentage) {
@@ -111,18 +166,29 @@
                         var countryName = feature.properties['Country Name'];
                         var value = feature.properties[subIndicator + " Increased by " + percentage];
 
+                        // Create popup content
+                        var popupContent;
+
+                        if (value === 0) {
+                            popupContent = `
+                                <div class="popup-header">In <strong>${countryName}</strong></div>
+                                <div class="popup-content">
+                                    No exposure data is currently available.
+                                </div>
+                            `;
+                        } else {
+                            popupContent = `
+                                <div class="popup-header">In <strong>${countryName}</strong></div>
+                                <div class="popup-content">
+                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
+                                </div>
+                            `;
+                        }
+
                         // Add to the global sum if the value is defined and is a number
                         if (value !== undefined && !isNaN(value)) {
                             sum += value;
                         }
-
-                        // Create popup content
-                        var popupContent = `
-                        <div class="popup-header">In <strong>${countryName}</strong></div>
-                        <div class="popup-content">
-                            <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s<br>
-                        </div>
-                    `;
 
                         layer.bindPopup(popupContent);
                     }
@@ -131,36 +197,59 @@
                 // Display the sum below the map
                 var sumDisplay = document.getElementById('sum-display');
                 sumDisplay.innerHTML = `
-                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1970s.
+                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
                 `;
             }
-            // Load the GeoJSON file
-            fetch(geojson_Url)
-                .then(response => response.json())
-                .then(data => {
-                    geojsonData = data;
-                    updateMap('Heatwave Frequency', '50%');
-                })
-                .catch(error => {
-                    console.error('Error loading the GeoJSON file:', error);
-                });
+
+            // Load the GeoJSON file for the selected year
+            function loadGeojsonForYear(year, callback) {
+                toggleSpinner(true);
+                fetch(geojsonUrls[year])
+                    .then(response => response.json())
+                    .then(data => {
+                        geojsonData = data;
+                        if (callback) callback();
+                        toggleSpinner(false);
+                    })
+                    .catch(error => {
+                        toggleSpinner(false);
+                        console.error('Error loading the GeoJSON file:', error);
+                    });
+            }
+
+            // Initial load
+            loadGeojsonForYear(currentYear, function () {
+                updateMap('Heatwave Frequency', '50%');
+            });
 
             // Event listeners for the filters
+            document.getElementById('yearDropdown').addEventListener('change', function () {
+                var selectedYear = this.value;
+                if (selectedYear !== currentYear) {
+                    currentYear = selectedYear;
+                    loadGeojsonForYear(currentYear, function () {
+                        var subIndicator = document.getElementById('sub-indicator').value;
+                        var percentage = document.getElementById('percentage').value;
+                        updateMap(subIndicator, percentage);
+                    });
+                }
+            });
             document.getElementById('sub-indicator').addEventListener('change', function () {
-                var subIndicator = document.getElementById('sub-indicator').value;
+                var subIndicator = this.value;
                 var percentage = document.getElementById('percentage').value;
                 updateMap(subIndicator, percentage);
             });
 
             document.getElementById('percentage').addEventListener('change', function () {
                 var subIndicator = document.getElementById('sub-indicator').value;
-                var percentage = document.getElementById('percentage').value;
+                var percentage = this.value;
                 updateMap(subIndicator, percentage);
             });
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
             document.getElementById('downloadBtn').addEventListener('click', function () {
-                var csvUrl = 'https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries_2023.csv'
+                var selectedYear = document.getElementById('yearDropdown').value;
+                var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
                 window.open(csvUrl, '_blank');
             });
 
