@@ -143,7 +143,7 @@
             var currentYear = "2023";
 
             // URLs for geojson files by year
-            const geojsonUrls = { "2023": "https://unicefdownloadfiletest.blob.core.windows.net/prueba/child_exposure_2023_unicef.geojson" };
+            const geojsonUrls = { "2023": "https://unicefstorage.blob.core.windows.net/hwstorage/child_exposure_2023_unicef.geojson" };
 
             const loadingDiv = document.getElementById('loading');
 
@@ -249,7 +249,7 @@
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
             document.getElementById('downloadBtn').addEventListener('click', function () {
                 var selectedYear = document.getElementById('yearDropdown').value;
-                var csvUrl = `https://unicefdownloadfiletest.blob.core.windows.net/prueba/Exposure_change_for_Countries_${selectedYear}.csv`;
+                var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
                 window.open(csvUrl, '_blank');
             });
 
