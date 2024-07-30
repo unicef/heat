@@ -166,18 +166,29 @@
                         var countryName = feature.properties['Country Name'];
                         var value = feature.properties[subIndicator + " Increased by " + percentage];
 
+                        // Create popup content
+                        var popupContent;
+
+                        if (value === 0) {
+                            popupContent = `
+                                <div class="popup-header">In <strong>${countryName}</strong></div>
+                                <div class="popup-content">
+                                    No exposure data is currently available.
+                                </div>
+                            `;
+                        } else {
+                            popupContent = `
+                                <div class="popup-header">In <strong>${countryName}</strong></div>
+                                <div class="popup-content">
+                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
+                                </div>
+                            `;
+                        }
+
                         // Add to the global sum if the value is defined and is a number
                         if (value !== undefined && !isNaN(value)) {
                             sum += value;
                         }
-
-                        // Create popup content
-                        var popupContent = `
-                        <div class="popup-header">In <strong>${countryName}</strong></div>
-                        <div class="popup-content">
-                            <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
-                        </div>
-                    `;
 
                         layer.bindPopup(popupContent);
                     }
