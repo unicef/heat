@@ -5,9 +5,7 @@ from rio_cogeo.cogeo import cog_translate
 from rio_cogeo.profiles import cog_profiles
 
 
-def load_hwi_from_geotiff(
-    heatwave_indicator: str, decade: int
-) -> tuple[np.ndarray, dict, dict]:
+def load_hwi_from_geotiff(heatwave_indicator: str, decade: int) -> tuple[np.ndarray, dict, dict]:
     """
     Load a specific band from a raster file.
 
@@ -30,9 +28,7 @@ def load_hwi_from_geotiff(
         "heatwaves_extreme_high_temp": 4,
     }
 
-    assert (
-        heatwave_indicator in bands.keys()
-    ), f"Invalid heatwave indicator: {heatwave_indicator}"
+    assert heatwave_indicator in bands.keys(), f"Invalid heatwave indicator: {heatwave_indicator}"
 
     assert decade in [
         1960,
@@ -110,9 +106,7 @@ def hwi_to_cog(indicator, decade):
     hwi_filepath = f"data/transformed/average_{indicator}_{decade}s_proj.tif"
 
     # Path to the new GeoTIFF file
-    hwi_cog_filepath = (
-        f"data/transformed/cog/average_{indicator}_{decade}s_proj_COG.tif"
-    )
+    hwi_cog_filepath = f"data/transformed/cog/average_{indicator}_{decade}s_proj_COG.tif"
 
     with rasterio.open(hwi_filepath) as src:
         dst_profile = cog_profiles.get("deflate")
