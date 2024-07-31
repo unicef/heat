@@ -1,104 +1,116 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>UNICEF Children's Exposure</title>
 
     <!-- Leaflet CSS for map styling -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
 
     <!-- Styles for the map and UI elements -->
     <style>
-        #controls {
-            margin: 10px;
+      #controls {
+        margin: 10px;
+      }
+
+      #map {
+        height: 600px;
+        width: 100%;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
 
-        #map {
-            height: 600px;
-            width: 100%;
+        100% {
+          transform: rotate(360deg);
         }
+      }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+      #loading {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
+      }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
+      .spinner {
+        margin: 0 auto;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1cabe2;
+        border-radius: 50%;
+        animation: spin 2s linear infinite;
+      }
 
-        #loading {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
-        }
-
-        .spinner {
-            margin: 0 auto;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #1cabe2;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-
-        .leaflet-container {
-            background-color: rgba(255, 0, 0, 0.0);
-        }
+      .leaflet-container {
+        background-color: rgba(255, 0, 0, 0);
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- Website title -->
     <h1>Children's Exposure to Heatwaves</h1>
 
     <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
-        <label for="yearDropdown">Year of the report:</label>
-        <select id="yearDropdown" disabled>
-            <option value="2023">2023</option>
-            <!-- Future options for other years can be added here -->
-        </select>
+      <label for="yearDropdown">Year of the report:</label>
+      <select id="yearDropdown" disabled>
+        <option value="2023">2023</option>
+        <!-- Future options for other years can be added here -->
+      </select>
 
-        <label for="sub-indicator">Select sub-indicator:</label>
-        <select id="sub-indicator">
-            <option value="Heatwave Frequency">Frequency</option>
-            <option value="Heatwave Duration">Duration</option>
-            <option value="Heatwave Severity">Severity</option>
-            <option value="Extreme Heat Days">Extreme High Temp.</option>
-        </select>
+      <label for="sub-indicator">Select sub-indicator:</label>
+      <select id="sub-indicator">
+        <option value="Heatwave Frequency">Frequency</option>
+        <option value="Heatwave Duration">Duration</option>
+        <option value="Heatwave Severity">Severity</option>
+        <option value="Extreme Heat Days">Extreme High Temp.</option>
+      </select>
 
-        <label for="percentage">Select percentage increase:</label>
-        <select id="percentage">
-            <option value="50%">50%</option>
-            <option value="100%">100%</option>
-            <option value="200%">200%</option>
-        </select>
+      <label for="percentage">Select percentage increase:</label>
+      <select id="percentage">
+        <option value="50%">50%</option>
+        <option value="100%">100%</option>
+        <option value="200%">200%</option>
+      </select>
 
-        <!-- Button to download CSV and reset map view -->
-        <button id="downloadBtn" style="margin-left: 10px;">Download CSV</button>
-        <button id="reset-view">Reset View</button>
+      <!-- Button to download CSV and reset map view -->
+      <button id="downloadBtn" style="margin-left: 10px">Download CSV</button>
+      <button id="reset-view">Reset View</button>
     </div>
 
     <!-- Map container -->
     <div id="map">
-        <!-- Loading message container -->
-        <div id="loading">
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                <div class="spinner"></div>
-                <p style="text-align: center; margin-top: 10px;">Loading...</p>
-            </div>
+      <!-- Loading message container -->
+      <div id="loading">
+        <div
+          style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          "
+        >
+          <div class="spinner"></div>
+          <p style="text-align: center; margin-top: 10px">Loading...</p>
         </div>
+      </div>
     </div>
 
     <!-- Sum display -->
@@ -107,159 +119,182 @@
     <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
-    <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        (function () { // This is to be able to embed the script into the index.html
-            // initalize leaflet map
-            var defaultView = [40, 0];
-            var defaultZoom = 2;
-            var map = L.map('map', {
+            (function () {
+              // This is to be able to embed the script into the index.html
+              // initalize leaflet map
+              var defaultView = [40, 0];
+              var defaultZoom = 2;
+              var map = L.map("map", {
                 minZoom: 2,
                 maxZoom: 18,
-                worldCopyJump: false // Prevents the map from wrapping around
-            }).setView(defaultView, defaultZoom);
+                worldCopyJump: false, // Prevents the map from wrapping around
+              }).setView(defaultView, defaultZoom);
 
-            // add OpenStreetMap basemap
-            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+              // add OpenStreetMap basemap
+              L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
                 noWrap: true,
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+                attribution:
+                  '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+              }).addTo(map);
 
-            // Searchbox to search by location
-            var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false
-            }).addTo(map);
+              // Searchbox to search by location
+              var geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+              }).addTo(map);
 
-            geocoder.on('markgeocode', function (e) {
+              geocoder.on("markgeocode", function (e) {
                 var center = e.geocode.center;
                 map.setView(center, 4);
-            });
+              });
 
-            var geojsonLayer;
-            var geojsonData;
-            var currentYear = "2023";
+              var geojsonLayer;
+              var geojsonData;
+              var currentYear = "2023";
 
-            // URLs for geojson files by year
-            const geojsonUrls = { "2023": "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_2023.geojson" };
+              // URLs for geojson files by year
+              const geojsonUrls = { "2023": "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_2023.geojson" };
 
-            const loadingDiv = document.getElementById('loading');
+              const loadingDiv = document.getElementById("loading");
 
-            // Helper function to show or hide loading spinner
-            function toggleSpinner(show) {
-                loadingDiv.style.display = show ? 'block' : 'none';
-            }
+              // Helper function to show or hide loading spinner
+              function toggleSpinner(show) {
+                loadingDiv.style.display = show ? "block" : "none";
+              }
 
-            // Function to update the map based on selected filters
-            function updateMap(subIndicator, percentage) {
+              // Function to update the map based on selected filters
+              function updateMap(subIndicator, percentage) {
                 if (geojsonLayer) {
-                    map.removeLayer(geojsonLayer);
-                    map.closePopup();
+                  map.removeLayer(geojsonLayer);
+                  map.closePopup();
                 }
 
                 var sum = 0; // For global statistics
 
                 geojsonLayer = L.geoJson(geojsonData, {
-                    onEachFeature: function (feature, layer) {
-                        var countryName = feature.properties['Country Name'];
-                        var value = feature.properties[subIndicator + " Increased by " + percentage];
+                  onEachFeature: function (feature, layer) {
+                    var countryName = feature.properties["Country Name"];
+                    var value =
+                      feature.properties[
+                        subIndicator + " Increased by " + percentage
+                      ];
 
-                        // Create popup content
-                        var popupContent;
+                    // Create popup content
+                    var popupContent;
 
-                        if (value === 0) {
-                            popupContent = `
-                                <div class="popup-header">In <strong>${countryName}</strong></div>
-                                <div class="popup-content">
-                                    No exposure data is currently available.
-                                </div>
-                            `;
-                        } else {
-                            popupContent = `
-                                <div class="popup-header">In <strong>${countryName}</strong></div>
-                                <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
-                                </div>
-                            `;
-                        }
-
-                        // Add to the global sum if the value is defined and is a number
-                        if (value !== undefined && !isNaN(value)) {
-                            sum += value;
-                        }
-
-                        layer.bindPopup(popupContent);
+                    if (value === 0) {
+                      popupContent = `
+                                      <div class="popup-header">In <strong>${countryName}</strong></div>
+                                      <div class="popup-content">
+                                          No exposure data is currently available.
+                                      </div>
+                                  `;
+                    } else {
+                      popupContent = `
+                                      <div class="popup-header">In <strong>${countryName}</strong></div>
+                                      <div class="popup-content">
+                                          <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
+                                      </div>
+                                  `;
                     }
+
+                    // Add to the global sum if the value is defined and is a number
+                    if (value !== undefined && !isNaN(value)) {
+                      sum += value;
+                    }
+
+                    layer.bindPopup(popupContent);
+                  },
                 }).addTo(map);
 
                 // Display the sum below the map
-                var sumDisplay = document.getElementById('sum-display');
+                var sumDisplay = document.getElementById("sum-display");
                 sumDisplay.innerHTML = `
-                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
-                `;
-            }
+                          Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
+                      `;
+              }
 
-            // Load the GeoJSON file for the selected year
-            function loadGeojsonForYear(year, callback) {
+              // Load the GeoJSON file for the selected year
+              function loadGeojsonForYear(year, callback) {
                 toggleSpinner(true);
                 fetch(geojsonUrls[year])
-                    .then(response => response.json())
-                    .then(data => {
-                        geojsonData = data;
-                        if (callback) callback();
-                        toggleSpinner(false);
-                    })
-                    .catch(error => {
-                        toggleSpinner(false);
-                        console.error('Error loading the GeoJSON file:', error);
-                    });
-            }
+                  .then((response) => response.json())
+                  .then((data) => {
+                    geojsonData = data;
+                    if (callback) callback();
+                    toggleSpinner(false);
+                  })
+                  .catch((error) => {
+                    toggleSpinner(false);
+                    console.error("Error loading the GeoJSON file:", error);
+                  });
+              }
 
-            // Initial load
-            loadGeojsonForYear(currentYear, function () {
-                updateMap('Heatwave Frequency', '50%');
-            });
+              // Initial load
+              loadGeojsonForYear(currentYear, function () {
+                updateMap("Heatwave Frequency", "50%");
+              });
 
-            // Event listeners for the filters
-            document.getElementById('yearDropdown').addEventListener('change', function () {
-                var selectedYear = this.value;
-                if (selectedYear !== currentYear) {
+              // Event listeners for the filters
+              document
+                .getElementById("yearDropdown")
+                .addEventListener("change", function () {
+                  var selectedYear = this.value;
+                  if (selectedYear !== currentYear) {
                     currentYear = selectedYear;
                     loadGeojsonForYear(currentYear, function () {
-                        var subIndicator = document.getElementById('sub-indicator').value;
-                        var percentage = document.getElementById('percentage').value;
-                        updateMap(subIndicator, percentage);
+                      var subIndicator =
+                        document.getElementById("sub-indicator").value;
+                      var percentage = document.getElementById("percentage").value;
+                      updateMap(subIndicator, percentage);
                     });
-                }
-            });
-            document.getElementById('sub-indicator').addEventListener('change', function () {
-                var subIndicator = this.value;
-                var percentage = document.getElementById('percentage').value;
-                updateMap(subIndicator, percentage);
-            });
+                  }
+                });
+              document
+                .getElementById("sub-indicator")
+                .addEventListener("change", function () {
+                  var subIndicator = this.value;
+                  var percentage = document.getElementById("percentage").value;
+                  updateMap(subIndicator, percentage);
+                });
 
-            document.getElementById('percentage').addEventListener('change', function () {
-                var subIndicator = document.getElementById('sub-indicator').value;
-                var percentage = this.value;
-                updateMap(subIndicator, percentage);
-            });
+              document
+                .getElementById("percentage")
+                .addEventListener("change", function () {
+                  var subIndicator = document.getElementById("sub-indicator").value;
+                  var percentage = this.value;
+                  updateMap(subIndicator, percentage);
+                });
 
-            // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-            document.getElementById('downloadBtn').addEventListener('click', function () {
-                var selectedYear = document.getElementById('yearDropdown').value;
-                var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
-                window.open(csvUrl, '_blank');
-            });
+      <<<<<<< HEAD
+                  // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+                  document.getElementById('downloadBtn').addEventListener('click', function () {
+                      var selectedYear = document.getElementById('yearDropdown').value;
+                      var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
+                      window.open(csvUrl, '_blank');
+                  });
+      =======
+              // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+              document
+                .getElementById("downloadBtn")
+                .addEventListener("click", function () {
+                  var selectedYear = document.getElementById("yearDropdown").value;
+                  var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
+                  window.open(csvUrl, "_blank");
+                });
+      >>>>>>> 0d67f56 (Render geotiff on map by selected year and hwi)
 
-            // Event listener for reset view button click
-            document.getElementById('reset-view').addEventListener('click', function () {
-                map.setView(defaultView, defaultZoom);
-            });
-
-        })();
+              // Event listener for reset view button click
+              document
+                .getElementById("reset-view")
+                .addEventListener("click", function () {
+                  map.setView(defaultView, defaultZoom);
+                });
+            })();
     </script>
-</body>
-
+  </body>
 </html>

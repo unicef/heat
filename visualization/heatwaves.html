@@ -123,7 +123,7 @@
       <div id="legend"></div>
     </div>
 
-    <!-- import necessary scripts -->
+    <!-- Import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
@@ -159,6 +159,7 @@
           map.setView(center, 4);
         });
 
+        // URLs for TIFF files by year and sub-indicator
         const tiffUrls = {
           1960: {
             frequency:
@@ -298,7 +299,7 @@
         // Add raster layer to the map and update the legend with color scale
         function addLayer(band) {
           const steps = 5;
-          const { min, max } = bandRanges[band];
+          const { min, max } = bandRanges[0];
           const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
           const colorLookup = scale.colors(steps); // Create a lookup table for colors
           const overflowColor = "#500000";
