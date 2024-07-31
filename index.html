@@ -1,119 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>UNICEF Children's Exposure to Heatwaves</title>
 
     <!-- Leaflet CSS for map styling -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
 
     <style>
-        .header {
-            display: flex;
-            align-items: center;
-            background-color: #1cabe2;
-            padding: 30px;
-        }
+      .header {
+        display: flex;
+        align-items: center;
+        background-color: #1cabe2;
+        padding: 30px;
+      }
 
-        .header img {
-            height: 25px;
-        }
+      .header img {
+        height: 25px;
+      }
 
-        .content-wrapper {
-            padding: 20px;
-        }
+      .content-wrapper {
+        padding: 20px;
+      }
 
-        #content {
-            margin-top: 20px;
-        }
+      #content {
+        margin-top: 20px;
+      }
 
-        .custom-button {
-            background-color: #FFFFFF;
-            border: none;
-            color: #000000;
-            cursor: pointer;
-        }
+      .custom-button {
+        background-color: #ffffff;
+        border: none;
+        color: #000000;
+        cursor: pointer;
+      }
 
-        .custom-button:hover,
-        .custom-button:focus {
-            background-color: #FFFFFF;
-            border: none;
-            color: #1cabe2;
-        }
+      .custom-button:hover,
+      .custom-button:focus {
+        background-color: #ffffff;
+        border: none;
+        color: #1cabe2;
+      }
 
-        .custom-button.active {
-            color: #1cabe2;
-        }
+      .custom-button.active {
+        color: #1cabe2;
+      }
     </style>
+  </head>
 
-</head>
-
-<body>
+  <body>
     <!-- Header section with UNICEF logo -->
     <div class="header">
-        <img src="https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/unicef-logo.webp"
-            alt="UNICEF Logo">
+      <img
+        src="https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/unicef-logo.webp"
+        alt="UNICEF Logo"
+      />
     </div>
 
     <!-- Content wrapper with buttons and content div -->
     <div class="content-wrapper">
-        <!-- Buttons to load different pages -->
-        <button class="custom-button" onclick="loadPage('visualization/heatwaves.html', this)">Climate
-            Indicators</button>
-        <button class="custom-button" onclick="loadPage('visualization/childexposure.html', this)">Children's
-            Exposure</button>
-        <div id="content">
-            <!-- The selected page will be loaded here -->
-        </div>
+      <!-- Buttons to load different pages -->
+      <button
+        class="custom-button"
+        onclick="loadPage('visualization/heatwaves.html', this)"
+      >
+        Climate Indicators
+      </button>
+      <button
+        class="custom-button"
+        onclick="loadPage('visualization/childexposure.html', this)"
+      >
+        Children's Exposure
+      </button>
+      <div id="content">
+        <!-- The selected page will be loaded here -->
+      </div>
     </div>
 
     <!-- Import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
-    <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        // Function to load a page into the content div
-        function loadPage(page, button) {
-            // Remove active class from all buttons
-            document.querySelectorAll('.custom-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
+      // Function to load a page into the content div
+      function loadPage(page, button) {
+        // Remove active class from all buttons
+        document.querySelectorAll(".custom-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
 
-            // Add active class to clicked button
-            button.classList.add('active');
+        // Add active class to clicked button
+        button.classList.add("active");
 
-            fetch(page)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('content').innerHTML = data;
-                    executeScripts(); // Execute any scripts in the loaded page
-                });
-        }
+        fetch(page)
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("content").innerHTML = data;
+            executeScripts(); // Execute any scripts in the loaded page
+          });
+      }
 
-        // Function to execute scripts in the loaded page content
-        function executeScripts() {
-            const scripts = document.querySelectorAll('#content script');
-            scripts.forEach(script => {
-                const newScript = document.createElement('script');
-                newScript.textContent = script.textContent;
-                document.body.appendChild(newScript);
-                document.body.removeChild(newScript); // Remove after execution to avoid duplication
-            });
-        }
+      // Function to execute scripts in the loaded page content
+      function executeScripts() {
+        const scripts = document.querySelectorAll("#content script");
+        scripts.forEach((script) => {
+          const newScript = document.createElement("script");
+          newScript.textContent = script.textContent;
+          document.body.appendChild(newScript);
+          document.body.removeChild(newScript); // Remove after execution to avoid duplication
+        });
+      }
 
-        // Load the first page by default when the page loads
-        window.onload = function () {
-            const defaultButton = document.querySelector('.custom-button');
-            loadPage('visualization/heatwaves.html', defaultButton);
-        }
+      // Load the first page by default when the page loads
+      window.onload = function () {
+        const defaultButton = document.querySelector(".custom-button");
+        loadPage("visualization/heatwaves.html", defaultButton);
+      };
     </script>
-
-</body>
-
+  </body>
 </html>
