@@ -84,6 +84,9 @@ def write_hwi(
     # predictor=2/standard predictor implies horizontal differencing
     kwargs.update(driver="GTiff", count=1, predictor=2)
 
+    # Setting the recommended blocksize for internal tiling to 512 per recommendations
+    kwargs.update({"blockxsize": "512", "blockysize": "512"})
+
     # Round to the specified number of decimals
     if round_decimals:
         print(f"Rounding to {round_decimals} decimals...")
@@ -116,7 +119,12 @@ def hwi_to_cog(indicator, decade):
 
         # Creating destination COG
         cog_translate(
-            src, hwi_cog_filepath, dst_profile, use_cog_driver=True, in_memory=False
+            src,
+            hwi_cog_filepath,
+            dst_profile,
+            nodata=np.nan,
+            use_cog_driver=True,
+            in_memory=False,
         )
 
     print(f"New Cloud Optimized GeoTIFF file written to: {hwi_cog_filepath}")
