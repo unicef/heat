@@ -165,6 +165,16 @@
                 2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_2023.geojson",
             };
 
+            // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
+            // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
+            // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
+            const bandRanges = {
+                'Heatwave Frequency': { min: 0, max: 95 },   // Frequency
+                'Heatwave Duration': { min: 0, max: 40 },    // Duration
+                'Heatwave Severity': { min: 0, max: 95 },   // Severity
+                'Extreme Heat Days': { min: 0, max: 95 }   // Extreme High Temp.
+            };
+
             const loadingDiv = document.getElementById("loading");
 
             // Helper function to show or hide loading spinner
@@ -173,9 +183,14 @@
             }
 
             // Helper function to get color based on value
-            function getColor(value, min, max, steps, colorLookup) {
+            function getColor(value, min, max, steps, colorLookup, overflowColor) {
                 if (value === 0 || value === null || value === undefined || isNaN(value)) {
                     return null;
+                }
+
+                if (value > max) {
+                    // Return a specific color for values greater than max
+                    return overflowColor;
                 }
 
                 // Calculate the index for the color lookup
@@ -183,19 +198,10 @@
 
                 // Return the color from the lookup
                 return colorLookup[index];
-
-                // return value > 80 ? '#800026' :
-                //     value > 60 ? '#BD0026' :
-                //         value > 40 ? '#E31A1C' :
-                //             value > 20 ? '#FC4E2A' :
-                //                 value > 10 ? '#FD8D3C' :
-                //                     value > 5 ? '#FEB24C' :
-                //                         value > 0 ? '#FED976' :
-                //                             '#FFEDA0';
             }
 
             // Helper function to update the legend with color scale
-            function updateLegend(min, max, steps, scale) {
+            function updateLegend(min, max, steps, colorLookup, overflowColor) {
                 var legend = document.getElementById('legend');
                 legend.innerHTML = '<strong>Color Scale</strong><br>';
 
@@ -207,23 +213,30 @@
                     const rangeMin = min + i * stepSize;
                     const rangeMax = min + (i + 1) * stepSize;
 
+                    // Calculate the index for the color lookup
+                    const index = Math.floor(((rangeMin - min) / (max - min)) * (steps - 1));
+
                     legend.innerHTML += `
-                        <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
-                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
+                        <div style="background-color: ${colorLookup[index]}; width: 20px; height: 20px; display: inline-block;"></div>
+                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}%</label><br>`;
                 }
+                // Add a new color box for values higher than the max
+                legend.innerHTML += `
+                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
+                    <label>${max}+</label><br>`;
             }
 
             // Function to update the map based on selected filters
             function updateMap(subIndicator, percentage) {
-                const min = 0;
-                const max = 100;
+                const { min, max } = bandRanges[subIndicator];
                 const steps = 5;
                 const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
                 const colorLookup = scale.colors(steps); // Create a lookup table for colors
+                const overflowColor = '#500000';
 
                 var sum = 0; // For global statistics
 
-                updateLegend(min, max, steps, scale);
+                updateLegend(min, max, steps, colorLookup, overflowColor);
 
                 if (geojsonLayer) {
                     map.removeLayer(geojsonLayer);
@@ -234,16 +247,17 @@
                     style: function (feature) {
                         var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
                         return {
-                            fillColor: getColor(value_percentage, min, max, steps, colorLookup),
+                            fillColor: getColor(value_percentage, min, max, steps, colorLookup, overflowColor),
                             weight: 1,
                             opacity: 1,
-                            color: 'white',
+                            color: '#d4e4fa',
                             fillOpacity: 0.7
                         };
                     },
                     onEachFeature: function (feature, layer) {
                         var countryName = feature.properties['Country Name'];
                         var value = feature.properties[subIndicator + " Increased by " + percentage];
+                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
 
                         // Create popup content
                         var popupContent;
@@ -259,7 +273,7 @@
                             popupContent = `
                                 <div class="popup-header">In <strong>${countryName}</strong></div>
                                 <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
+                                    <strong>${value.toLocaleString()}</strong> children (${value_percentage}% of total) live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
                                 </div>
                             `;
                         }
