@@ -79,8 +79,9 @@
 
     <!-- Control panel for selecting decade and sub-indicators, and download button -->
     <div id="controls">
-      <label for="decadeDropdown">Select Year:</label>
+      <label for="decadeDropdown">Select Decade:</label>
       <select id="decadeDropdown">
+        <option value="0"></option>
         <option value="1960">1960</option>
         <option value="1970">1970</option>
         <option value="1980">1980</option>
@@ -92,6 +93,7 @@
 
       <label for="hwiSelector">Select sub-indicator:</label>
       <select id="hwiSelector">
+        <option value="0"></option>
         <option value="frequency">Frequency</option>
         <option value="duration">Duration</option>
         <option value="severity">Severity</option>
@@ -299,7 +301,6 @@
 
         // Add raster layer to the map and update the legend with color scale
         function addRasterLayer(hwi) {
-          console.log("Adding raster layer for", hwi);
           const steps = 5;
           const { min, max } = hwiRanges[hwi];
           const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
@@ -311,7 +312,6 @@
 
           // Remove previous layer (if any)
           if (currentLayer) {
-            console.log("Removing previous layer");
             map.removeLayer(currentLayer);
           }
 
@@ -356,7 +356,6 @@
             resolution: 256,
           });
           // Display the layer on the map
-          console.log("Displaying new layer to map");
           currentLayer.addTo(map);
           // Adjust the map's view to fit the bounds of the newly added raster layer.
           // map.fitBounds(currentLayer.getBounds());
@@ -364,21 +363,27 @@
 
         // Load the TIFF file for the selected decade
         function loadTiff(decade, hwi) {
-          toggleSpinner(true);
+          if (decade !== "0" && hwi !== "0") {
+            toggleSpinner(true);
 
-          fetch(tiffUrls[decade][hwi])
-            .then((response) => response.arrayBuffer())
-            .then((arrayBuffer) => {
-              parseGeoraster(arrayBuffer).then((georaster) => {
-                currentGeoRaster = georaster;
-                addRasterLayer(hwi);
+            fetch(tiffUrls[decade][hwi])
+              .then((response) => response.arrayBuffer())
+              .then((arrayBuffer) => {
+                parseGeoraster(arrayBuffer).then((georaster) => {
+                  currentGeoRaster = georaster;
+                  addRasterLayer(hwi);
+                  toggleSpinner(false);
+                });
+              })
+              .catch(() => {
                 toggleSpinner(false);
+                alert("Failed to load data. Please try again.");
               });
-            })
-            .catch(() => {
-              toggleSpinner(false);
-              alert("Failed to load data. Please try again.");
-            });
+          } else {
+            if (currentLayer) {
+              map.removeLayer(currentLayer);
+            }
+          }
         }
 
         // Initial load
