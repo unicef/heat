@@ -161,20 +161,57 @@
                 loadingDiv.style.display = show ? "block" : "none";
             }
 
+            // Helper function to get color based on value
+            function getColor(value, min, max, steps, colorLookup) {
+                if (value === 0 || value === null || value === undefined || isNaN(value)) {
+                    return null;
+                }
+
+                // Calculate the index for the color lookup
+                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+
+                // Return the color from the lookup
+                return colorLookup[index];
+
+                // return value > 80 ? '#800026' :
+                //     value > 60 ? '#BD0026' :
+                //         value > 40 ? '#E31A1C' :
+                //             value > 20 ? '#FC4E2A' :
+                //                 value > 10 ? '#FD8D3C' :
+                //                     value > 5 ? '#FEB24C' :
+                //                         value > 0 ? '#FED976' :
+                //                             '#FFEDA0';
+            }
+
             // Function to update the map based on selected filters
             function updateMap(subIndicator, percentage) {
+                const min = 0;
+                const max = 100;
+                const steps = 5;
+                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
+                const colorLookup = scale.colors(steps); // Create a lookup table for colors
+
+                var sum = 0; // For global statistics
+
                 if (geojsonLayer) {
                     map.removeLayer(geojsonLayer);
                     map.closePopup();
                 }
 
-                var sum = 0; // For global statistics
-
                 geojsonLayer = L.geoJson(geojsonData, {
+                    style: function (feature) {
+                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
+                        return {
+                            fillColor: getColor(value_percentage, min, max, steps, colorLookup),
+                            weight: 1,
+                            opacity: 1,
+                            color: 'white',
+                            fillOpacity: 0.7
+                        };
+                    },
                     onEachFeature: function (feature, layer) {
                         var countryName = feature.properties['Country Name'];
                         var value = feature.properties[subIndicator + " Increased by " + percentage];
-                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage]
 
                         // Create popup content
                         var popupContent;
