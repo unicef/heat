@@ -184,7 +184,7 @@
 
             // Helper function to get color based on value
             function getColor(value, min, max, steps, colorLookup, overflowColor) {
-                if (value === 0 || value === null || value === undefined || isNaN(value)) {
+                if (value === null || value === undefined || isNaN(value)) {
                     return null;
                 }
 
@@ -250,7 +250,7 @@
                             fillColor: getColor(value_percentage, min, max, steps, colorLookup, overflowColor),
                             weight: 1,
                             opacity: 1,
-                            color: '#d4e4fa',
+                            color: '#b4cfd9',
                             fillOpacity: 0.7
                         };
                     },
