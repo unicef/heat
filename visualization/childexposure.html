@@ -124,180 +124,173 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-            (function () {
-              // This is to be able to embed the script into the index.html
-              // initalize leaflet map
-              var defaultView = [40, 0];
-              var defaultZoom = 2;
-              var map = L.map("map", {
-                minZoom: 2,
-                maxZoom: 18,
-                worldCopyJump: false, // Prevents the map from wrapping around
-              }).setView(defaultView, defaultZoom);
+      (function () {
+        // This is to be able to embed the script into the index.html
+        // initalize leaflet map
+        var defaultView = [40, 0];
+        var defaultZoom = 2;
+        var map = L.map("map", {
+          minZoom: 2,
+          maxZoom: 18,
+          worldCopyJump: false, // Prevents the map from wrapping around
+        }).setView(defaultView, defaultZoom);
 
-              // add OpenStreetMap basemap
-              L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                noWrap: true,
-                attribution:
-                  '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-              }).addTo(map);
+        // add OpenStreetMap basemap
+        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+          noWrap: true,
+          attribution:
+            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
 
-              // Searchbox to search by location
-              var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-              }).addTo(map);
+        // Searchbox to search by location
+        var geocoder = L.Control.geocoder({
+          defaultMarkGeocode: false,
+        }).addTo(map);
 
-              geocoder.on("markgeocode", function (e) {
-                var center = e.geocode.center;
-                map.setView(center, 4);
-              });
+        geocoder.on("markgeocode", function (e) {
+          var center = e.geocode.center;
+          map.setView(center, 4);
+        });
 
-              var geojsonLayer;
-              var geojsonData;
-              var currentYear = "2023";
+        var geojsonLayer;
+        var geojsonData;
+        var currentYear = "2023";
 
-              // URLs for geojson files by year
-              const geojsonUrls = { "2023": "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_2023.geojson" };
+        // URLs for geojson files by year
+        const geojsonUrls = {
+          2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_2023.geojson",
+        };
 
-              const loadingDiv = document.getElementById("loading");
+        const loadingDiv = document.getElementById("loading");
 
-              // Helper function to show or hide loading spinner
-              function toggleSpinner(show) {
-                loadingDiv.style.display = show ? "block" : "none";
-              }
+        // Helper function to show or hide loading spinner
+        function toggleSpinner(show) {
+          loadingDiv.style.display = show ? "block" : "none";
+        }
 
-              // Function to update the map based on selected filters
-              function updateMap(subIndicator, percentage) {
-                if (geojsonLayer) {
-                  map.removeLayer(geojsonLayer);
-                  map.closePopup();
-                }
+        // Function to update the map based on selected filters
+        function updateMap(subIndicator, percentage) {
+          if (geojsonLayer) {
+            map.removeLayer(geojsonLayer);
+            map.closePopup();
+          }
 
-                var sum = 0; // For global statistics
+          var sum = 0; // For global statistics
 
-                geojsonLayer = L.geoJson(geojsonData, {
-                  onEachFeature: function (feature, layer) {
-                    var countryName = feature.properties["Country Name"];
-                    var value =
-                      feature.properties[
-                        subIndicator + " Increased by " + percentage
-                      ];
+          geojsonLayer = L.geoJson(geojsonData, {
+            onEachFeature: function (feature, layer) {
+              var countryName = feature.properties["Country Name"];
+              var value =
+                feature.properties[
+                  subIndicator + " Increased by " + percentage
+                ];
 
-                    // Create popup content
-                    var popupContent;
+              // Create popup content
+              var popupContent;
 
-                    if (value === 0) {
-                      popupContent = `
+              if (value === 0) {
+                popupContent = `
                                       <div class="popup-header">In <strong>${countryName}</strong></div>
                                       <div class="popup-content">
                                           No exposure data is currently available.
                                       </div>
                                   `;
-                    } else {
-                      popupContent = `
+              } else {
+                popupContent = `
                                       <div class="popup-header">In <strong>${countryName}</strong></div>
                                       <div class="popup-content">
                                           <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
                                       </div>
                                   `;
-                    }
+              }
 
-                    // Add to the global sum if the value is defined and is a number
-                    if (value !== undefined && !isNaN(value)) {
-                      sum += value;
-                    }
+              // Add to the global sum if the value is defined and is a number
+              if (value !== undefined && !isNaN(value)) {
+                sum += value;
+              }
 
-                    layer.bindPopup(popupContent);
-                  },
-                }).addTo(map);
+              layer.bindPopup(popupContent);
+            },
+          }).addTo(map);
 
-                // Display the sum below the map
-                var sumDisplay = document.getElementById("sum-display");
-                sumDisplay.innerHTML = `
+          // Display the sum below the map
+          var sumDisplay = document.getElementById("sum-display");
+          sumDisplay.innerHTML = `
                           Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
                       `;
-              }
+        }
 
-              // Load the GeoJSON file for the selected year
-              function loadGeojsonForYear(year, callback) {
-                toggleSpinner(true);
+        // Load the GeoJSON file for the selected year
+        function loadGeojsonForYear(year, callback) {
+          toggleSpinner(true);
 
-                var url = geojsonUrls[year];
+          var url = geojsonUrls[year];
 
-                fetch(url, { cache: "force-cache" })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    geojsonData = data;
-                    if (callback) callback();
-                    toggleSpinner(false);
-                  })
-                  .catch((error) => {
-                    toggleSpinner(false);
-                    console.error("Error loading the GeoJSON file:", error);
-                  });
-              }
+          fetch(url, { cache: "force-cache" })
+            .then((response) => response.json())
+            .then((data) => {
+              geojsonData = data;
+              if (callback) callback();
+              toggleSpinner(false);
+            })
+            .catch((error) => {
+              toggleSpinner(false);
+              console.error("Error loading the GeoJSON file:", error);
+            });
+        }
 
-              // Initial load
+        // Initial load
+        loadGeojsonForYear(currentYear, function () {
+          updateMap("Heatwave Frequency", "50%");
+        });
+
+        // Event listeners for the filters
+        document
+          .getElementById("yearDropdown")
+          .addEventListener("change", function () {
+            var selectedYear = this.value;
+            if (selectedYear !== currentYear) {
+              currentYear = selectedYear;
               loadGeojsonForYear(currentYear, function () {
-                updateMap("Heatwave Frequency", "50%");
+                var subIndicator =
+                  document.getElementById("sub-indicator").value;
+                var percentage = document.getElementById("percentage").value;
+                updateMap(subIndicator, percentage);
               });
+            }
+          });
+        document
+          .getElementById("sub-indicator")
+          .addEventListener("change", function () {
+            var subIndicator = this.value;
+            var percentage = document.getElementById("percentage").value;
+            updateMap(subIndicator, percentage);
+          });
 
-              // Event listeners for the filters
-              document
-                .getElementById("yearDropdown")
-                .addEventListener("change", function () {
-                  var selectedYear = this.value;
-                  if (selectedYear !== currentYear) {
-                    currentYear = selectedYear;
-                    loadGeojsonForYear(currentYear, function () {
-                      var subIndicator =
-                        document.getElementById("sub-indicator").value;
-                      var percentage = document.getElementById("percentage").value;
-                      updateMap(subIndicator, percentage);
-                    });
-                  }
-                });
-              document
-                .getElementById("sub-indicator")
-                .addEventListener("change", function () {
-                  var subIndicator = this.value;
-                  var percentage = document.getElementById("percentage").value;
-                  updateMap(subIndicator, percentage);
-                });
+        document
+          .getElementById("percentage")
+          .addEventListener("change", function () {
+            var subIndicator = document.getElementById("sub-indicator").value;
+            var percentage = this.value;
+            updateMap(subIndicator, percentage);
+          });
 
-              document
-                .getElementById("percentage")
-                .addEventListener("change", function () {
-                  var subIndicator = document.getElementById("sub-indicator").value;
-                  var percentage = this.value;
-                  updateMap(subIndicator, percentage);
-                });
+        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", function () {
+            var selectedYear = document.getElementById("yearDropdown").value;
+            var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
+            window.open(csvUrl, "_blank");
+          });
 
-      <<<<<<< HEAD
-                  // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-                  document.getElementById('downloadBtn').addEventListener('click', function () {
-                      var selectedYear = document.getElementById('yearDropdown').value;
-                      var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
-                      window.open(csvUrl, '_blank');
-                  });
-      =======
-              // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-              document
-                .getElementById("downloadBtn")
-                .addEventListener("click", function () {
-                  var selectedYear = document.getElementById("yearDropdown").value;
-                  var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
-                  window.open(csvUrl, "_blank");
-                });
-      >>>>>>> 0d67f56 (Render geotiff on map by selected year and hwi)
-
-              // Event listener for reset view button click
-              document
-                .getElementById("reset-view")
-                .addEventListener("click", function () {
-                  map.setView(defaultView, defaultZoom);
-                });
-            })();
+        // Event listener for reset view button click
+        document
+          .getElementById("reset-view")
+          .addEventListener("click", function () {
+            map.setView(defaultView, defaultZoom);
+          });
+      })();
     </script>
   </body>
 </html>
