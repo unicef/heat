@@ -21,6 +21,15 @@
             width: 100%;
         }
 
+        #legend {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            padding: 10px;
+            background: white;
+            z-index: 1001;
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -104,6 +113,8 @@
                 <p style="text-align: center; margin-top: 10px">Loading...</p>
             </div>
         </div>
+        <!-- Color scale legend container -->
+        <div id="legend"></div>
     </div>
 
     <!-- Sum display -->
@@ -183,6 +194,25 @@
                 //                             '#FFEDA0';
             }
 
+            // Helper function to update the legend with color scale
+            function updateLegend(min, max, steps, scale) {
+                var legend = document.getElementById('legend');
+                legend.innerHTML = '<strong>Color Scale</strong><br>';
+
+                // Calculate the range step size
+                const stepSize = (max - min) / steps;
+
+                // Create the color blocks and labels
+                for (let i = 0; i < steps; i++) {
+                    const rangeMin = min + i * stepSize;
+                    const rangeMax = min + (i + 1) * stepSize;
+
+                    legend.innerHTML += `
+                        <div style="background-color: ${scale(rangeMin)}; width: 20px; height: 20px; display: inline-block;"></div>
+                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</label><br>`;
+                }
+            }
+
             // Function to update the map based on selected filters
             function updateMap(subIndicator, percentage) {
                 const min = 0;
@@ -192,6 +222,8 @@
                 const colorLookup = scale.colors(steps); // Create a lookup table for colors
 
                 var sum = 0; // For global statistics
+
+                updateLegend(min, max, steps, scale);
 
                 if (geojsonLayer) {
                     map.removeLayer(geojsonLayer);
