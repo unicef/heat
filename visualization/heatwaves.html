@@ -366,7 +366,9 @@
           if (decade !== "0" && hwi !== "0") {
             toggleSpinner(true);
 
-            fetch(tiffUrls[decade][hwi])
+            var url = tiffUrls[decade][hwi];
+
+            fetch(url, { cache: "force-cache" })
               .then((response) => response.arrayBuffer())
               .then((arrayBuffer) => {
                 parseGeoraster(arrayBuffer).then((georaster) => {

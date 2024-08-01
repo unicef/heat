@@ -221,7 +221,10 @@
               // Load the GeoJSON file for the selected year
               function loadGeojsonForYear(year, callback) {
                 toggleSpinner(true);
-                fetch(geojsonUrls[year])
+
+                var url = geojsonUrls[year];
+
+                fetch(url, { cache: "force-cache" })
                   .then((response) => response.json())
                   .then((data) => {
                     geojsonData = data;
