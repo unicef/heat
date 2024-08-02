@@ -267,6 +267,7 @@
             // Helper function to update the legend with color scale
             function updateLegend(min, max, steps, colorLookup, overflowColor) {
                 var legend = document.getElementById('legend');
+
                 legend.innerHTML = '<strong>Color Scale</strong><br>';
 
                 // Calculate the range step size
@@ -298,7 +299,10 @@
                 const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
                 const colorLookup = scale.colors(steps); // Create a lookup table for colors
                 const overflowColor = "#500000";
-                if (!currentGeoRaster) return; // Abort if there is no data available.
+                if (!currentGeoRaster) {
+                    document.getElementById('legend').innerHTML = '';
+                    return; // Abort if there is no data available.
+                }
 
                 updateLegend(min, max, steps, colorLookup, overflowColor);
 
@@ -324,6 +328,7 @@
                         toggleSpinner(false);
                         alert("Failed to load data. Please try again.");
                         map.removeLayer(currentLayer);
+                        document.getElementById('legend').innerHTML = '';
                     },
                     // Assign colors to individual pixels based on their value
                     pixelValuesToColorFn: function (pixelValues) {
@@ -374,17 +379,28 @@
                             toggleSpinner(false);
                             alert("Failed to load data. Please try again.");
                             map.removeLayer(currentLayer);
+                            document.getElementById('legend').innerHTML = '';
                         });
                 } else {
                     if (currentLayer) {
                         map.removeLayer(currentLayer);
+                        document.getElementById('legend').innerHTML = '';
                     }
                 }
             }
 
+            // Helper function to update map based on the selected filters
+            function updateFilters() {
+                var selectedDecade = document.getElementById("decadeDropdown").value;
+                var selectedHwi = document.getElementById("hwiSelector").value;
+
+                loadTiff(selectedDecade, selectedHwi);
+            }
+
+            //helper function to enable download botton when all filters are selected
             function updateButtonState() {
-                var selectedDecade = decadeDropdown.value;
-                var selectedHwi = hwiSelector.value;
+                var selectedDecade = document.getElementById("decadeDropdown").value;
+                var selectedHwi = document.getElementById("hwiSelector").value;
 
                 if (selectedDecade !== "0" && selectedHwi !== "0") {
                     downloadBtn.disabled = false;
@@ -399,9 +415,7 @@
             document
                 .getElementById("decadeDropdown")
                 .addEventListener("change", function () {
-                    var selectedDecade = this.value;
-                    var hwiSelector = document.getElementById("hwiSelector").value;
-                    loadTiff(selectedDecade, hwiSelector);
+                    updateFilters();
                     updateButtonState();
                 });
 
@@ -409,10 +423,7 @@
             document
                 .getElementById("hwiSelector")
                 .addEventListener("change", function () {
-                    var hwiSelector = this.value;
-                    var selectedDecade =
-                        document.getElementById("decadeDropdown").value;
-                    loadTiff(selectedDecade, hwiSelector);
+                    updateFilters();
                     updateButtonState();
                 });
 
