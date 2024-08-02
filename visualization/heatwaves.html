@@ -96,7 +96,7 @@
         </select>
 
         <!-- Button to download CSV and reset map view -->
-        <button id="downloadBtn" style="margin-left: 10px">Download TIF</button>
+        <button id="downloadBtn" disabled style="margin-left: 10px">Download TIF</button>
         <button id="reset-view">Reset View</button>
     </div>
 
@@ -380,11 +380,16 @@
                 }
             }
 
-            // Initial load
-            loadTiff(
-                document.getElementById("decadeDropdown").value,
-                document.getElementById("hwiSelector").value
-            );
+            function updateButtonState() {
+                var selectedDecade = decadeDropdown.value;
+                var selectedHwi = hwiSelector.value;
+
+                if (selectedDecade !== "0" && selectedHwi !== "0") {
+                    downloadBtn.disabled = false;
+                } else {
+                    downloadBtn.disabled = true;
+                }
+            }
 
             // Event listeners for dropdown changes and button clicks
 
@@ -395,6 +400,7 @@
                     var selectedDecade = this.value;
                     var hwiSelector = document.getElementById("hwiSelector").value;
                     loadTiff(selectedDecade, hwiSelector);
+                    updateButtonState();
                 });
 
             // Listen for a change event on the 'hwiSelector' element and call the loadTiff with the newly selected decade.
@@ -405,16 +411,19 @@
                     var selectedDecade =
                         document.getElementById("decadeDropdown").value;
                     loadTiff(selectedDecade, hwiSelector);
+                    updateButtonState();
                 });
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
             document
                 .getElementById("downloadBtn")
                 .addEventListener("click", function () {
-                    var selectedDecade =
-                        document.getElementById("decadeDropdown").value;
+                    var selectedDecade = document.getElementById("decadeDropdown").value;
                     var hwiSelector = document.getElementById("hwiSelector").value;
+
+                    // Both selections are made and are different from 0, proceed with the download
                     window.open(tiffUrls[selectedDecade][hwiSelector], "_blank");
+
                 });
 
             // Event listener for reset view button click
