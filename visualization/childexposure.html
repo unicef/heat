@@ -1,127 +1,464 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>UNICEF Children's Exposure</title>
 
     <!-- Leaflet CSS for map styling -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
     <!-- Styles for the map and UI elements -->
     <style>
-        #controls {
-            margin: 10px;
+      #map {
+        height: 600px;
+        width: 100%;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
 
-        #map {
-            height: 600px;
-            width: 100%;
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      #loading {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
+      }
+
+      .leaflet-container {
+        background-color: rgba(255, 0, 0, 0);
+      }
+      body,
+      html {
+        font-family: "Roboto", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 0 auto;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        background-color: #1cabe2;
+        padding: 30px;
+        width: 100% !important;
+      }
+
+      .header img {
+        height: 25px;
+      }
+
+      #content {
+        margin-top: 20px;
+      }
+      .leaflet-control-zoom-in {
+        width: 20px !important;
+        height: 25px !important;
+        line-height: 25px !important;
+      }
+      .leaflet-control-zoom-out.leaflet-disabled {
+        width: 20px !important;
+        height: 25px !important;
+        line-height: 25px !important;
+      }
+
+      .custom-button {
+        border: none;
+        color: #000000;
+        cursor: pointer;
+        padding: 24px 10px;
+        border-radius: 20px 20px 0px 0px;
+        background: #d0d0d033;
+        border-bottom: 5px solid #d0d0d005;
+        transition: all.3s;
+      }
+      .leaflet-touch.leaflet-control-geocoder {
+        min-width: 20px !important;
+        min-height: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+      }
+      .custom-button:hover {
+        background: #d0d0d080;
+        transition: all.3s;
+      }
+      .leaflet-control-geocoder.leaflet-bar.leaflet-control {
+        min-width: 20px !important;
+        min-height: 20px !important;
+      }
+      .leaflet-control-geocoder-icon {
+        width: 20px !important;
+        height: 20px !important ;
+      }
+      .custom-button-active {
+        background: #d0d0d080;
+        border: none;
+        color: #000000;
+        cursor: pointer;
+        padding: 24px 10px;
+        border-radius: 20px 20px 0px 0px;
+        border-bottom: 5px solid #0093ef;
+      }
+      #map {
+        position: relative;
+        height: 600px;
+        width: 100%;
+        border-radius: 10px;
+        z-index: 2;
+      }
+
+      #legend {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        padding: 10px;
+        background: white;
+        z-index: 1001;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
 
-        #legend {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            padding: 10px;
-            background: white;
-            z-index: 1001;
+        100% {
+          transform: rotate(360deg);
         }
+      }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+      .spinner {
+        margin: 0 auto;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1cabe2;
+        border-radius: 50%;
+        animation: spin 2s linear infinite;
+      }
 
-            100% {
-                transform: rotate(360deg);
-            }
+      .leaflet-container {
+        background-color: rgba(255, 0, 0, 0);
+      }
+      .text-bottom {
+        padding-left: 30px;
+      }
+      .leaflet-left.leaflet-control {
+        margin: 0;
+      }
+      .leaflet-control-geocoder.leaflet-bar.leaflet-control {
+        left: initial;
+        top: 3.5rem;
+        right: 0.9rem;
+      }
+      .leaflet-top.leaflet-left {
+        left: initial;
+        top: 6rem;
+        right: 1.5rem;
+      }
+      .leaflet-touch.leaflet-bar a {
+        width: 20px !important;
+        height: 30px !important;
+      }
+      .titleBox {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 34px;
+        margin-top: 34px;
+      }
+
+      .title {
+        margin: 0;
+      }
+      .subtitle {
+        margin: 0;
+      }
+
+      .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        padding: 21px 30px;
+        background: #f5f5f5;
+        border: 1px solid #ffffff;
+        border-radius: 10px;
+        max-width: 380px;
+      }
+
+      .filtersGap {
+        display: flex;
+        gap: 14px;
+        flex-direction: column;
+      }
+      a.leaflet-control-zoom-out {
+        width: 20px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+      }
+      a.leaflet-control-zoom-in {
+        width: 20px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+      }
+      .container {
+        display: flex;
+        background: #f1f1f1;
+        gap: 19px;
+        padding: 20px;
+        @media screen and (max-width: 1240px) {
+          flex-direction: column;
         }
+      }
 
-        #loading {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
-        }
+      .filterStyle {
+        padding: 10px 20px;
+        display: flex;
+        box-shadow: 4px 4px 5.2px 0px #00000014;
+        border: 0px;
+        border-radius: 4px;
+        opacity: 80%;
+      }
+      .scales {
+        display: flex;
+        gap: 13px;
+        font-size: 10px;
+      }
+      .scale-1 {
+        width: 14px;
+        height: 14px;
+        background: #fff7ec;
+      }
+      .scale-2 {
+        width: 14px;
+        height: 14px;
+        background: #fdd49e;
+      }
+      .scale-3 {
+        width: 14px;
+        height: 14px;
+        background: #fc8d59;
+      }
+      .scale-4 {
+        width: 14px;
+        height: 14px;
+        background: #d73020;
+      }
+      .scale-5 {
+        width: 14px;
+        height: 14px;
+        background: #7f0000;
+      }
+      .scale-6 {
+        width: 14px;
+        height: 14px;
+        background: #500000;
+      }
 
-        .spinner {
-            margin: 0 auto;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #1cabe2;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
+      .buttonDownload {
+        color: white;
+        background: #1eaae2;
+        border: transparent;
+        width: fit-content;
+        padding: 10px 30px;
+        line-height: 14.06px;
+      }
+      .buttonReset {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #d0d0d0;
+        display: flex;
+        color: #878787;
+        border: transparent;
+        margin: 20px;
+        padding: 10px 30px;
+        border-radius: 4px;
+        z-index: 100000;
+        animation-duration: 0.5s;
+      }
+      .buttonReset:hover {
+        background: #ffffff;
+      }
+      .align-scale {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .pages-buttons {
+        position: relative;
+      }
+      .wrapper {
+        padding-left: 255px;
+        padding-right: 255px;
+        @media screen and (max-width: 1600px) {
+          padding-left: 200px;
+          padding-right: 200px;
         }
+        @media screen and (max-width: 1400px) {
+          padding-left: 150px;
+          padding-right: 150px;
+        }
+        @media screen and (max-width: 1000px) {
+          padding-left: 100px;
+          padding-right: 100px;
+        }
+        @media screen and (max-width: 700px) {
+          padding-left: 50px;
+          padding-right: 50px;
+        }
+        @media screen and (max-width: 700px) {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+      .logo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media screen and (max-width: 850px) {
+          flex-direction: column;
+          align-items: baseline;
+        }
+      }
 
-        .leaflet-container {
-            background-color: rgba(255, 0, 0, 0);
+      .border {
+        border-top: 1px solid black;
+        padding: 10px;
+      }
+      .tryo {
+        height: 20px;
+      }
+      .tryo,
+      img {
+        margin-left: 10px;
+      }
+      .logo-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media screen and (max-width: 850px) {
+          align-items: center;
         }
+      }
     </style>
-</head>
+  </head>
 
-<body>
-    <!-- Website title -->
-    <h1>Children's Exposure to Heatwaves</h1>
-
-    <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
-    <div id="controls">
-        <label for="yearDropdown">Year of Report:</label>
-        <select id="yearDropdown">
-            <option value="0">Select Year</option>
-            <option value="2023">2023</option>
-            <!-- Future options for other years can be added here -->
-        </select>
-
-        <label for="sub-indicator">Sub-indicator:</label>
-        <select id="sub-indicator">
-            <option value="0">Select Sub-indicator</option>
-            <option value="Heatwave Frequency">Frequency</option>
-            <option value="Heatwave Duration">Duration</option>
-            <option value="Heatwave Severity">Severity</option>
-            <option value="Extreme Heat Days">Extreme Heat Days</option>
-        </select>
-
-        <label for="percentage">Percentage Increase:</label>
-        <select id="percentage">
-            <option value="0">Select Percentage Increase</option>
-            <option value="50%">50%</option>
-            <option value="100%">100%</option>
-            <option value="200%">200%</option>
-        </select>
-
-        <!-- Button to download CSV and reset map view -->
-        <button id="downloadBtn" disabled style="margin-left: 10px">Download CSV</button>
-        <button id="reset-view">Reset View</button>
+  <body>
+    <div class="header">
+      <div class="wrapper">
+        <img
+          src="https://unicefstorage.blob.core.windows.net/hwstorage/unicef-logo.webp"
+          alt="UNICEF Logo"
+        />
+      </div>
     </div>
-
-    <!-- Map container -->
-    <div id="map">
-        <!-- Loading message container -->
-        <div id="loading">
-            <div style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-          ">
-                <div class="spinner"></div>
-                <p style="text-align: center; margin-top: 10px">Loading...</p>
-            </div>
+    <div class="wrapper">
+      <!-- Website title -->
+      <div class="titleBox">
+        <div class="logo">
+          <h1>Heatwave trends explorer</h1>
+          <div class="logo-container">
+            <p>Developed in collaboration with</p>
+            <img src="/heatwaves/img/logo.svg" alt="logo" class="tryo" />
+          </div>
         </div>
-        <!-- Color scale legend container -->
-        <div id="legend"></div>
-    </div>
+        <p class="subtitle">
+          Tracking heatwave indicators and children's exposure (1960-2020)
+        </p>
+      </div>
+      <div class="pages-buttons">
+        <a href="/heatwaves/index.html">
+          <button class="custom-button">Climate Indicators</button>
+        </a>
+        <a href="visualization/childexposure.html">
+          <button class="custom-button-active">Children's Exposure</button>
+        </a>
+      </div>
+      <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
+      <div class="container">
+        <div class="filters" id="controls">
+          <div>
+            <p>EXPLORE DATA</p>
+            <p>
+              Click on a country on the map to visualize how many children are
+              living in areas where the heatwave indicators have significantly
+              increased between 1960s and 2020s.
+            </p>
+          </div>
+          <div class="filtersGap">
+            <label for="sub-indicator">Indicator</label>
+            <select class="filterStyle" id="sub-indicator">
+              <option value="Heatwave Frequency">Frequency</option>
+              <option value="Heatwave Duration">Duration</option>
+              <option value="Heatwave Severity">Severity</option>
+              <option value="Extreme Heat Days">Extreme High Temp.</option>
+            </select>
+          </div>
+          <div class="filtersGap">
+            <label for="percentage">Percentage increase</label>
+            <select onchange="changeText" class="filterStyle" id="percentage">
+              <option value="50%">50%</option>
+              <option value="100%">100%</option>
+              <option value="200%">200%</option>
+            </select>
+          </div>
+          <div class="border" id="sum-display"></div>
+          <!-- Button to download CSV and reset map view -->
+          <button class="buttonDownload" id="downloadBtn">DOWNLOAD .CSV</button>
+        </div>
 
-    <!-- Sum display -->
-    <div id="sum-display"></div>
+        <!-- Map container -->
+        <div id="map">
+          <!-- Loading message container -->
+          <div id="loading">
+            <div
+              style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+              "
+            >
+              <div class="spinner"></div>
+              <p style="text-align: center; margin-top: 10px">Loading...</p>
+            </div>
+          </div>
+          <button class="buttonReset" id="reset-view">RESET ZOOM</button>
+        </div>
+      </div>
+      <div class="text-bottom">
+        <p>
+          The data presented on this page is sourced from lorem ipsum © <br />
+          UNICEF | Tryolabs 2024
+        </p>
+      </div>
+    </div>
 
     <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
@@ -131,259 +468,170 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-        (function () {
-            // This is to be able to embed the script into the index.html
-            // initalize leaflet map
-            var defaultView = [40, 0];
-            var defaultZoom = 2;
-            var map = L.map("map", {
-                minZoom: 2,
-                maxZoom: 18,
-                worldCopyJump: false, // Prevents the map from wrapping around
-            }).setView(defaultView, defaultZoom);
+      (function () {
+        // This is to be able to embed the script into the index.html
+        // initalize leaflet map
+        var defaultView = [40, 0];
+        var defaultZoom = 2;
+        var map = L.map("map", {
+          minZoom: 2,
+          maxZoom: 18,
+          worldCopyJump: false, // Prevents the map from wrapping around
+        }).setView(defaultView, defaultZoom);
 
-            // add OpenStreetMap basemap
-            L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                noWrap: true,
-                attribution:
-                    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-            }).addTo(map);
+        // add OpenStreetMap basemap
+        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+          noWrap: true,
+          attribution:
+            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
 
-            // Searchbox to search by location
-            var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-            }).addTo(map);
+        // Searchbox to search by location
+        var geocoder = L.Control.geocoder({
+          defaultMarkGeocode: false,
+        }).addTo(map);
 
-            geocoder.on("markgeocode", function (e) {
-                var center = e.geocode.center;
-                map.setView(center, 4);
-            });
+        geocoder.on("markgeocode", function (e) {
+          var center = e.geocode.center;
+          map.setView(center, 4);
+        });
 
-            var geojsonLayer;
-            var geojsonData;
+        var geojsonLayer;
+        var geojsonData;
+        var currentYear = "2023";
 
-            // URLs for geojson files by year
-            const geojsonUrls = {
-                2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
-            };
+        // URLs for geojson files by year
+        const geojsonUrls = {
+          2023: "https://unicefstorage.blob.core.windows.net/hwstorage/child_exposure_2023_unicef.geojson",
+        };
 
-            // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
-            // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
-            // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
-            const bandRanges = {
-                'Heatwave Frequency': { min: 0, max: 95 },   // Frequency
-                'Heatwave Duration': { min: 0, max: 40 },    // Duration
-                'Heatwave Severity': { min: 0, max: 95 },   // Severity
-                'Extreme Heat Days': { min: 0, max: 95 }   // Extreme High Temp.
-            };
+        const loadingDiv = document.getElementById("loading");
 
-            const loadingDiv = document.getElementById("loading");
+        // Helper function to show or hide loading spinner
+        function toggleSpinner(show) {
+          loadingDiv.style.display = show ? "block" : "none";
+        }
 
-            // Helper function to show or hide loading spinner
-            function toggleSpinner(show) {
-                loadingDiv.style.display = show ? "block" : "none";
-            }
+        // Function to update the map based on selected filters
+        function updateMap(subIndicator, percentage) {
+          if (geojsonLayer) {
+            map.removeLayer(geojsonLayer);
+            map.closePopup();
+          }
 
-            // Helper function to get color based on value
-            function getColor(value, min, max, steps, colorLookup, overflowColor) {
-                if (value === null || value === undefined || isNaN(value)) {
-                    return null;
-                }
+          var sum = 0; // For global statistics
 
-                if (value > max) {
-                    // Return a specific color for values greater than max
-                    return overflowColor;
-                }
+          geojsonLayer = L.geoJson(geojsonData, {
+            onEachFeature: function (feature, layer) {
+              var countryName = feature.properties["Country Name"];
+              var value =
+                feature.properties[
+                  subIndicator + " Increased by " + percentage
+                ];
 
-                // Calculate the index for the color lookup
-                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+              // Create popup content
+              var popupContent;
 
-                // Return the color from the lookup
-                return colorLookup[index];
-            }
-
-            // Helper function to update the legend with color scale
-            function updateLegend(min, max, steps, colorLookup, overflowColor) {
-                var legend = document.getElementById('legend');
-                legend.innerHTML = '<strong>Color Scale</strong><br>';
-
-                // Calculate the range step size
-                const stepSize = (max - min) / steps;
-
-                // Create the color blocks and labels
-                for (let i = 0; i < steps; i++) {
-                    const rangeMin = min + i * stepSize;
-                    const rangeMax = min + (i + 1) * stepSize;
-
-                    // Calculate the index for the color lookup
-                    const index = Math.floor(((rangeMin - min) / (max - min)) * (steps - 1));
-
-                    legend.innerHTML += `
-                        <div style="background-color: ${colorLookup[index]}; width: 20px; height: 20px; display: inline-block;"></div>
-                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}%</label><br>`;
-                }
-                // Add a new color box for values higher than the max
-                legend.innerHTML += `
-                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
-                    <label>${max}+</label><br>`;
-            }
-
-            // Function to update the map based on selected filters
-            function updateMap(subIndicator, percentage) {
-                const { min, max } = bandRanges[subIndicator];
-                const steps = 5;
-                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-                const colorLookup = scale.colors(steps); // Create a lookup table for colors
-                const overflowColor = '#500000';
-
-                var sum = 0; // For global statistics
-
-                updateLegend(min, max, steps, colorLookup, overflowColor);
-
-                if (geojsonLayer) {
-                    map.removeLayer(geojsonLayer);
-                    map.closePopup();
-                }
-
-                geojsonLayer = L.geoJson(geojsonData, {
-                    style: function (feature) {
-                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
-                        return {
-                            fillColor: getColor(value_percentage, min, max, steps, colorLookup, overflowColor),
-                            weight: 1,
-                            opacity: 1,
-                            color: '#b4cfd9',
-                            fillOpacity: 0.7
-                        };
-                    },
-                    onEachFeature: function (feature, layer) {
-                        var countryName = feature.properties['Country Name'];
-                        var value = feature.properties[subIndicator + " Increased by " + percentage];
-                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
-
-                        // Create popup content
-                        var popupContent;
-
-                        if (value === 0) { // change here if different value is used for NO DATA
-                            popupContent = `
+              if (value === 0) {
+                popupContent = `
                                 <div class="popup-header">In <strong>${countryName}</strong></div>
                                 <div class="popup-content">
                                     No exposure data is currently available.
                                 </div>
                             `;
-                        } else {
-                            popupContent = `
+              } else {
+                popupContent = `
                                 <div class="popup-header">In <strong>${countryName}</strong></div>
                                 <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children (~${value_percentage}% of total) live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
+                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
                                 </div>
                             `;
-                        }
+              }
 
-                        // Add to the global sum if the value is defined and is a number
-                        if (value !== undefined && !isNaN(value)) {
-                            sum += value;
-                        }
+              // Add to the global sum if the value is defined and is a number
+              if (value !== undefined && !isNaN(value)) {
+                sum += value;
+              }
 
-                        layer.bindPopup(popupContent);
-                    },
-                }).addTo(map);
+              layer.bindPopup(popupContent);
+            },
+          }).addTo(map);
 
-                // Display the sum below the map
-                var sumDisplay = document.getElementById('sum-display');
-                sumDisplay.innerHTML = `
-                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s.
+          // Display the sum below the map
+          var sumDisplay = document.getElementById("sum-display");
+          sumDisplay.innerHTML = `
+                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
                 `;
-            }
+        }
 
-            // Load the GeoJSON file for the selected year
-            function loadGeojsonForYear(year, subIndicator, percentage, callback) {
-                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
-                    toggleSpinner(true);
+        // Load the GeoJSON file for the selected year
+        function loadGeojsonForYear(year, callback) {
+          toggleSpinner(true);
+          fetch(geojsonUrls[year])
+            .then((response) => response.json())
+            .then((data) => {
+              geojsonData = data;
+              if (callback) callback();
+              toggleSpinner(false);
+            })
+            .catch((error) => {
+              toggleSpinner(false);
+              console.error("Error loading the GeoJSON file:", error);
+            });
+        }
 
-                    var url = geojsonUrls[year];
+        // Initial load
+        loadGeojsonForYear(currentYear, function () {
+          updateMap("Heatwave Frequency", "50%");
+        });
 
-                    fetch(url, { cache: "force-cache" })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            geojsonData = data;
-                            if (callback) callback();
-                            toggleSpinner(false);
-                        })
-                        .catch((error) => {
-                            toggleSpinner(false);
-                            console.error("Error loading the GeoJSON file:", error);
-                            map.removeLayer(geojsonLayer);
-                            document.getElementById('legend').innerHTML = '';
-                        });
-                } else {
-                    // Remove the GeoJSON layer if it exists
-                    if (geojsonLayer) {
-                        map.removeLayer(geojsonLayer);
-                        document.getElementById('legend').innerHTML = '';
-                    }
-                }
-            }
+        // Event listeners for the filters
+        // document
+        //   .getElementById("yearDropdown")
+        //   .addEventListener("change", function () {
+        //     var selectedYear = this.value;
+        //     if (selectedYear !== currentYear) {
+        //       currentYear = selectedYear;
+        //       loadGeojsonForYear(currentYear, function () {
+        //         var subIndicator =
+        //           document.getElementById("sub-indicator").value;
+        //         var percentage = document.getElementById("percentage").value;
+        //         updateMap(subIndicator, percentage);
+        //       });
+        //     }
+        //   });
+        document
+          .getElementById("sub-indicator")
+          .addEventListener("change", function () {
+            var subIndicator = this.value;
+            var percentage = document.getElementById("percentage").value;
+            updateMap(subIndicator, percentage);
+          });
 
-            // Helper function to update map based on the selected filters
-            function updateFilters() {
-                var year = document.getElementById("yearDropdown").value;
-                var subIndicator = document.getElementById("sub-indicator").value;
-                var percentage = document.getElementById("percentage").value;
+        document
+          .getElementById("percentage")
+          .addEventListener("change", function () {
+            var subIndicator = document.getElementById("sub-indicator").value;
+            var percentage = this.value;
+            updateMap(subIndicator, percentage);
+          });
 
-                loadGeojsonForYear(year, subIndicator, percentage, function () {
-                    updateMap(subIndicator, percentage);
-                });
-            }
+        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", function () {
+            var selectedYear = document.getElementById("yearDropdown").value;
+            var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
+            window.open(csvUrl, "_blank");
+          });
 
-            //helper function to enable download botton when all filters are selected
-            function updateButtonState() {
-                var year = document.getElementById("yearDropdown").value;
-                var subIndicator = document.getElementById("sub-indicator").value;
-                var percentage = document.getElementById("percentage").value;
-
-                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
-                    downloadBtn.disabled = false;
-                } else {
-                    downloadBtn.disabled = true;
-                }
-            }
-
-            // Event listeners for the filters
-            document
-                .getElementById("yearDropdown")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-            document.getElementById("sub-indicator")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-            document.getElementById("percentage")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-
-            // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-            document
-                .getElementById("downloadBtn")
-                .addEventListener("click", function () {
-                    var selectedYear = document.getElementById("yearDropdown").value;
-                    var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
-                    window.open(csvUrl, "_blank");
-                });
-
-            // Event listener for reset view button click
-            document
-                .getElementById("reset-view")
-                .addEventListener("click", function () {
-                    map.setView(defaultView, defaultZoom);
-                });
-        })();
+        // Event listener for reset view button click
+        document
+          .getElementById("reset-view")
+          .addEventListener("click", function () {
+            map.setView(defaultView, defaultZoom);
+          });
+      })();
     </script>
-</body>
-
+  </body>
 </html>

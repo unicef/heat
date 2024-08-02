@@ -1,90 +1,422 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>UNICEF Children's Exposure to Heatwaves</title>
-
+    <title>Heatwave Indicators</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Leaflet CSS for map styling -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
     />
+    <!-- Leaflet CSS for map styling -->
 
+    <!-- Styles for the map and UI elements -->
     <style>
+      body,
+      html {
+        font-family: "Roboto", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        margin: 0 auto;
+        overflow-x: hidden;
+      }
       .header {
         display: flex;
         align-items: center;
         background-color: #1cabe2;
         padding: 30px;
+        width: 100% !important;
       }
 
       .header img {
         height: 25px;
       }
 
-      .content-wrapper {
-        padding: 20px;
-      }
-
       #content {
         margin-top: 20px;
       }
+      .leaflet-control-zoom-in {
+        width: 20px !important;
+        height: 25px !important;
+        line-height: 25px !important;
+      }
+      .leaflet-control-zoom-out.leaflet-disabled {
+        width: 20px !important;
+        height: 25px !important;
+        line-height: 25px !important;
+      }
 
       .custom-button {
-        background-color: #ffffff;
         border: none;
         color: #000000;
         cursor: pointer;
+        padding: 24px 10px;
+        border-radius: 20px 20px 0px 0px;
+        background: #d0d0d033;
+        border-bottom: 5px solid #d0d0d005;
+        transition: all.3s;
       }
-
-      .custom-button:hover,
-      .custom-button:focus {
-        background-color: #ffffff;
+      .leaflet-touch.leaflet-control-geocoder {
+        min-width: 20px !important;
+        min-height: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+      }
+      .custom-button:hover {
+        background: #d0d0d080;
+        transition: all.3s;
+      }
+      .leaflet-control-geocoder.leaflet-bar.leaflet-control {
+        min-width: 20px !important;
+        min-height: 20px !important;
+      }
+      .leaflet-control-geocoder-icon {
+        width: 20px !important;
+        height: 20px !important ;
+      }
+      .custom-button-active {
+        background: #d0d0d080;
         border: none;
-        color: #1cabe2;
+        color: #000000;
+        cursor: pointer;
+        padding: 24px 10px;
+        border-radius: 20px 20px 0px 0px;
+        border-bottom: 5px solid #0093ef;
+      }
+      #map {
+        position: relative;
+        height: 600px;
+        width: 100%;
+        border-radius: 10px;
+        z-index: 2;
       }
 
-      .custom-button.active {
-        color: #1cabe2;
+      #legend {
+        z-index: 1001;
+        display: flex;
+        gap: 13px;
+        flex-wrap: wrap;
+      }
+      #legend > strong {
+        width: 100%;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .scale {
+        display: flex;
+        gap: 13px;
+      }
+      #loading {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 1000;
+      }
+
+      .spinner {
+        margin: 0 auto;
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #1cabe2;
+        border-radius: 50%;
+        animation: spin 2s linear infinite;
+      }
+
+      .leaflet-container {
+        background-color: rgba(255, 0, 0, 0);
+      }
+      .text-bottom {
+        padding-top: 30px;
+      }
+      .leaflet-left.leaflet-control {
+        margin: 0;
+      }
+      .leaflet-control-geocoder.leaflet-bar.leaflet-control {
+        left: initial;
+        top: 3.5rem;
+        right: 0.9rem;
+      }
+      .leaflet-top.leaflet-left {
+        left: initial;
+        top: 6rem;
+        right: 1.5rem;
+      }
+      .leaflet-touch.leaflet-bar a {
+        width: 20px !important;
+        height: 30px !important;
+      }
+      .titleBox {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 34px;
+        margin-top: 34px;
+      }
+
+      .title {
+        margin: 0;
+      }
+      .subtitle {
+        margin: 0;
+      }
+
+      .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        padding: 21px 30px;
+        background: #f5f5f5;
+        border: 1px solid #ffffff;
+        border-radius: 10px;
+        max-width: 380px;
+      }
+
+      .filtersGap {
+        display: flex;
+        gap: 14px;
+        flex-direction: column;
+      }
+      a.leaflet-control-zoom-out {
+        width: 20px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+      }
+      a.leaflet-control-zoom-in {
+        width: 20px !important;
+        height: 30px !important;
+        line-height: 30px !important;
+      }
+      .container {
+        display: flex;
+        background: #f1f1f1;
+        gap: 19px;
+        padding: 20px;
+        @media screen and (max-width: 1240px) {
+          flex-direction: column;
+        }
+      }
+
+      .filterStyle {
+        padding: 10px 20px;
+        display: flex;
+        box-shadow: 4px 4px 5.2px 0px #00000014;
+        border: 0px;
+        border-radius: 4px;
+        opacity: 80%;
+      }
+
+      .buttonDownload {
+        color: white;
+        background: #1eaae2;
+        border: transparent;
+        width: fit-content;
+        padding: 10px 30px;
+        line-height: 14.06px;
+      }
+      .buttonReset {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #d0d0d0;
+        display: flex;
+        color: #878787;
+        border: transparent;
+        margin: 20px;
+        padding: 10px 30px;
+        border-radius: 4px;
+        z-index: 100000;
+        animation-duration: 0.5s;
+      }
+      .buttonReset:hover {
+        background: #ffffff;
+      }
+      .align-scale {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .pages-buttons {
+        position: relative;
+      }
+      .wrapper {
+        padding-left: 255px;
+        padding-right: 255px;
+        @media screen and (max-width: 1600px) {
+          padding-left: 200px;
+          padding-right: 200px;
+        }
+        @media screen and (max-width: 1400px) {
+          padding-left: 150px;
+          padding-right: 150px;
+        }
+        @media screen and (max-width: 1000px) {
+          padding-left: 100px;
+          padding-right: 100px;
+        }
+        @media screen and (max-width: 700px) {
+          padding-left: 50px;
+          padding-right: 50px;
+        }
+        @media screen and (max-width: 700px) {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+      .logo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media screen and (max-width: 850px) {
+          flex-direction: column;
+          align-items: baseline;
+        }
+      }
+      .logo-text {
+        display: flex;
+        text-align: center;
+      }
+      .tryo,
+      img {
+        margin-left: 10px;
+        height: 20px;
+      }
+      .logo-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        @media screen and (max-width: 850px) {
+          align-items: center;
+        }
       }
     </style>
   </head>
-
   <body>
-    <!-- Header section with UNICEF logo -->
     <div class="header">
-      <img
-        src="https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/unicef-logo.webp"
-        alt="UNICEF Logo"
-      />
-    </div>
-
-    <!-- Content wrapper with buttons and content div -->
-    <div class="content-wrapper">
-      <!-- Buttons to load different pages -->
-      <button
-        class="custom-button"
-        onclick="loadPage('visualization/heatwaves.html', this)"
-      >
-        Climate Indicators
-      </button>
-      <button
-        class="custom-button"
-        onclick="loadPage('visualization/childexposure.html', this)"
-      >
-        Children's Exposure
-      </button>
-      <div id="content">
-        <!-- The selected page will be loaded here -->
+      <div class="wrapper">
+        <img
+          src="https://unicefstorage.blob.core.windows.net/hwstorage/unicef-logo.webp"
+          alt="UNICEF Logo"
+        />
       </div>
     </div>
+    <div class="wrapper">
+      <!-- Website title -->
+      <div class="titleBox">
+        <div class="logo">
+          <h1 class="title">Heatwave Indicators</h1>
+          <div class="logo-container">
+            <p>Developed in collaboration with</p>
+            <img src="img/logo.svg" alt="logo" class="tryo" />
+          </div>
+        </div>
+        <p class="subtitle">
+          Discover heatwave increases and their effects on children (1960-2020)
+        </p>
+      </div>
+      <!-- Control panel for selecting year and sub-indicators, and download button -->
+      <div class="pages-buttons">
+        <a href="index.html">
+          <button class="custom-button-active">Climate Indicators</button>
+        </a>
+        <a href="visualization/childexposure.html">
+          <button class="custom-button">Children's Exposure</button>
+        </a>
+      </div>
+      <div class="container">
+        <div class="filters" id="controls">
+          <div>
+            <p>EXPLORE DATA</p>
+            <p>
+              Use the filters to explore heatwave data by decade and specific
+              indicators.
+            </p>
+          </div>
+          <div class="filtersGap">
+            <label for="yearDropdown">Decade</label>
+            <select class="filterStyle" id="yearDropdown">
+              <option value="1960">1960</option>
+              <option value="1970">1970</option>
+              <option value="1980">1980</option>
+              <option value="1990">1990</option>
+              <option value="2000">2000</option>
+              <option value="2010">2010</option>
+              <option value="2020">2020</option>
+            </select>
+          </div>
+          <div class="filtersGap">
+            <label for="bandSelector">Indicator</label>
+            <select class="filterStyle" id="bandSelector">
+              <option value="0">Frequency</option>
+              <option value="1">Duration</option>
+              <option value="2">Severity</option>
+              <option value="3">Extreme High Temp.</option>
+            </select>
+          </div>
+          <div>
+            <div id="legend"></div>
+          </div>
+          <!-- Button to download CSV and reset map view -->
+          <button class="buttonDownload" id="downloadBtn">
+            DOWNLOAD .TIFF
+          </button>
+        </div>
 
-    <!-- Import necessary scripts -->
+        <!-- Map container -->
+        <div id="map">
+          <!-- Loading message container -->
+          <div id="loading">
+            <div
+              style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+              "
+            >
+              <div class="spinner"></div>
+              <p style="text-align: center; margin-top: 10px">Loading...</p>
+            </div>
+          </div>
+          <!-- Color scale legend container -->
+
+          <button class="buttonReset" id="reset-view">RESET ZOOM</button>
+        </div>
+      </div>
+      <div class="text-bottom">
+        <p>
+          The data presented on this page is sourced from lorem ipsum © <br />
+          UNICEF | Tryolabs 2024
+        </p>
+      </div>
+    </div>
+    <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
@@ -92,40 +424,232 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <script>
-      // Function to load a page into the content div
-      function loadPage(page, button) {
-        // Remove active class from all buttons
-        document.querySelectorAll(".custom-button").forEach((btn) => {
-          btn.classList.remove("active");
+      (function () {
+        // This is to be able to embed the script into the index.html
+        // initalize leaflet map
+
+        var defaultView = [40, 0];
+        var defaultZoom = 2;
+        var map = L.map("map", {
+          minZoom: 2,
+          maxZoom: 18,
+          worldCopyJump: false, // Prevents the map from wrapping around
+        }).setView(defaultView, defaultZoom);
+
+        // Add Open Street Map layer
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          noWrap: true,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+        // Searchbox to search by location
+        var geocoder = L.Control.geocoder({
+          defaultMarkGeocode: false,
+        }).addTo(map);
+
+        geocoder.on("markgeocode", function (e) {
+          var center = e.geocode.center;
+          map.setView(center, 4);
         });
 
-        // Add active class to clicked button
-        button.classList.add("active");
+        // URLs for TIFF files by year
+        const tiffUrls = {
+          1960: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1960s_proj_COG2.tif",
+          1970: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1970s_proj_COG2.tif",
+          1980: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1980s_proj_COG2.tif",
+          1990: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1990s_proj_COG2.tif",
+          2000: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2000s_proj_COG2.tif",
+          2010: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2010s_proj_COG2.tif",
+          2020: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2020s_proj_COG2.tif",
+        };
 
-        fetch(page)
-          .then((response) => response.text())
-          .then((data) => {
-            document.getElementById("content").innerHTML = data;
-            executeScripts(); // Execute any scripts in the loaded page
+        // Maximum and minimum values per band are determined by calculating the mean and standard deviation for 2020.
+        // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
+        // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
+        const bandRanges = {
+          0: { min: 0, max: 15 }, // Frequency
+          1: { min: 0, max: 79 }, // Duration
+          2: { min: 0, max: 4 }, // Severity
+          3: { min: 0, max: 112 }, // Extreme High Temp.
+        };
+
+        var currentLayer,
+          currentGeoRaster,
+          currentBand = 0;
+        const loadingDiv = document.getElementById("loading");
+
+        // Helper function to show or hide loading spinner
+        function toggleSpinner(show) {
+          loadingDiv.style.display = show ? "block" : "none";
+        }
+
+        // Helper function to get color based on value
+        // values higher than the max of the selected band are clamped to the darkest color (to prevent outliers from skewing the perceptual scaling of data).
+        function getColor(value, min, max, steps, colorLookup, overflowColor) {
+          if (value > max) {
+            // Return a specific color for values greater than max
+            return overflowColor;
+          }
+
+          // Calculate the index for the color lookup
+          const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+
+          // Return the color from the lookup
+          return colorLookup[index];
+        }
+
+        // Helper function to update the legend with color scale
+        function updateLegend(min, max, steps, scale, overflowColor) {
+          var legend = document.getElementById("legend");
+          var bandSelector = document.getElementById("bandSelector");
+          var band = bandSelector.options[bandSelector.selectedIndex].text;
+          legend.innerHTML = `<strong>Color Scale | ${band}</strong> `;
+
+          // Calculate the range step size
+          const stepSize = (max - min) / steps;
+
+          // Create the color blocks and labels
+          for (let i = 0; i < steps; i++) {
+            const rangeMin = min + i * stepSize;
+            const rangeMax = min + (i + 1) * stepSize;
+
+            legend.innerHTML += `
+            <div style="display: flex; flex-direction: column; align-items: center; ">
+               <div style="background-color:  ${scale(
+                 rangeMin
+               )}; width: 20px; height: 20px;"></div> 
+                <div style="width: 100%; font-size: 10px;">${rangeMin.toFixed(
+                  0
+                )} - ${rangeMax.toFixed()}</div>
+         </div> `;
+          }
+
+          // Add a new color box for values higher than the max
+          legend.innerHTML += `
+          <div style="display: flex; flex-direction: column; font-size: 10px;">
+                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px;"></div>
+                    <div>${max}+</div>
+                  </div> `;
+        }
+
+        // Add raster layer to the map and update the legend with color scale
+        function addLayer(band) {
+          const steps = 5;
+          const { min, max } = bandRanges[band];
+          const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
+          const colorLookup = scale.colors(steps); // Create a lookup table for colors
+          const overflowColor = "#f1f1f1";
+
+          if (!currentGeoRaster) return; // Abort if there is no data available.
+
+          updateLegend(min, max, steps, scale, overflowColor);
+
+          // Remove previous layer (if any)
+          if (currentLayer) {
+            map.removeLayer(currentLayer);
+          }
+
+          // Add new GeoRaster layer
+          currentLayer = new GeoRasterLayer({
+            attribution: "Unicef",
+            noWrap: true, // Prevents from repeating the map at the edges.
+            georaster: currentGeoRaster,
+            opacity: 0.7,
+            // Handle the loading spinner.
+            onTileLoadStart: function () {
+              toggleSpinner(true);
+            },
+            onTileLoadEnd: function () {
+              toggleSpinner(false);
+            },
+            onTileLoadError: function () {
+              toggleSpinner(false);
+              alert("Failed to load data. Please try again.");
+            },
+            // Assign colors to individual pixels based on their value
+            pixelValuesToColorFn: function (pixelValues) {
+              var pixelValue = pixelValues[band];
+              if (
+                pixelValue === 0 ||
+                pixelValue === null ||
+                pixelValue === undefined ||
+                isNaN(pixelValue)
+              ) {
+                return null;
+              }
+              return getColor(
+                pixelValue,
+                min,
+                max,
+                steps,
+                colorLookup,
+                overflowColor
+              );
+            },
+            resolution: 256,
           });
-      }
+          // Display the layer on the map
+          currentLayer.addTo(map);
+          // Adjust the map's view to fit the bounds of the newly added raster layer.
+          // map.fitBounds(currentLayer.getBounds());
+        }
 
-      // Function to execute scripts in the loaded page content
-      function executeScripts() {
-        const scripts = document.querySelectorAll("#content script");
-        scripts.forEach((script) => {
-          const newScript = document.createElement("script");
-          newScript.textContent = script.textContent;
-          document.body.appendChild(newScript);
-          document.body.removeChild(newScript); // Remove after execution to avoid duplication
-        });
-      }
+        // Load the TIFF file for the selected year
+        function loadTiffForYear(year) {
+          toggleSpinner(true);
 
-      // Load the first page by default when the page loads
-      window.onload = function () {
-        const defaultButton = document.querySelector(".custom-button");
-        loadPage("visualization/heatwaves.html", defaultButton);
-      };
+          fetch(tiffUrls[year])
+            .then((response) => response.arrayBuffer())
+            .then((arrayBuffer) => {
+              parseGeoraster(arrayBuffer).then((georaster) => {
+                currentGeoRaster = georaster;
+                addLayer(currentBand);
+                toggleSpinner(false);
+              });
+            })
+            .catch(() => {
+              toggleSpinner(false);
+              alert("Failed to load data. Please try again.");
+            });
+        }
+
+        // Initial load
+        loadTiffForYear(document.getElementById("yearDropdown").value);
+
+        // Event listeners for dropdown changes and button clicks
+
+        // Listen for a change event on the 'yearDropdown' element and call the loadTiffForYear with the newly selected year.
+        document
+          .getElementById("yearDropdown")
+          .addEventListener("change", function () {
+            var selectedYear = this.value;
+            loadTiffForYear(selectedYear);
+          });
+
+        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band.
+        document
+          .getElementById("bandSelector")
+          .addEventListener("change", function (event) {
+            currentBand = parseInt(event.target.value);
+            addLayer(currentBand);
+          });
+
+        // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
+        document
+          .getElementById("downloadBtn")
+          .addEventListener("click", function () {
+            var year = document.getElementById("yearDropdown").value;
+            window.open(tiffUrls[year], "_blank");
+          });
+
+        // Event listener for reset view button click
+        document
+          .getElementById("reset-view")
+          .addEventListener("click", function () {
+            map.setView(defaultView, defaultZoom);
+          });
+      })();
     </script>
   </body>
 </html>
