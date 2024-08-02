@@ -1,16 +1,14 @@
 @font-face {
-  font-family: "univers";
-  src: local("univers"),
-    url("/heatwaves/fonts/univers/UniversLTStd.woff") format("woff");
+  font-family: 'univers';
+  src: url('../fonts/univers/UniversLTStd.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "univers";
-  src: local("univers"),
-    url("/heatwaves/fonts/univers/UniversLTStd-Bold.woff") format("woff");
+  font-family: 'univers';
+  src: url('../fonts/univers/UniversLTStd-Bold.otf') format('opentype');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -18,5 +16,5 @@
 
 html,
 body {
-  font-family: "univers";
+  font-family: 'univers';
 }
