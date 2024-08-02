@@ -73,14 +73,14 @@
 
     <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
-        <label for="yearDropdown">Year of the report:</label>
+        <label for="yearDropdown">Year of Report:</label>
         <select id="yearDropdown">
             <option value="0">Select Year</option>
             <option value="2023">2023</option>
             <!-- Future options for other years can be added here -->
         </select>
 
-        <label for="sub-indicator">sub-indicator:</label>
+        <label for="sub-indicator">Sub-indicator:</label>
         <select id="sub-indicator">
             <option value="0">Select Sub-indicator</option>
             <option value="Heatwave Frequency">Frequency</option>
@@ -313,12 +313,14 @@
                         .catch((error) => {
                             toggleSpinner(false);
                             console.error("Error loading the GeoJSON file:", error);
+                            map.removeLayer(geojsonLayer);
+                            document.getElementById('legend').innerHTML = '';
                         });
                 } else {
                     // Remove the GeoJSON layer if it exists
                     if (geojsonLayer) {
                         map.removeLayer(geojsonLayer);
-                        geojsonLayer = null;
+                        document.getElementById('legend').innerHTML = '';
                     }
                 }
             }
