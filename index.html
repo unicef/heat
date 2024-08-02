@@ -36,7 +36,8 @@
         display: flex;
         align-items: center;
         background-color: #0093ef;
-        padding: 30px;
+        padding-top: 30px;
+        padding-bottom: 30px;
       }
 
       .header img {
@@ -66,6 +67,9 @@
         background: #d0d0d033;
         border-bottom: 5px solid #d0d0d005;
         transition: all.3s;
+        border-top: 1px solid #f1f1f1;
+        border-left: 1px solid #f1f1f1;
+        border-right: 1px solid #f1f1f1;
       }
       .leaflet-touch.leaflet-control-geocoder {
         min-width: 20px !important;
@@ -77,6 +81,7 @@
         background: #d0d0d080;
         transition: all.3s;
       }
+
       .leaflet-control-geocoder.leaflet-bar.leaflet-control {
         min-width: 20px !important;
         min-height: 20px !important;
@@ -108,8 +113,10 @@
         gap: 13px;
         flex-wrap: wrap;
       }
-      #legend > strong {
+      #legend .lead-title {
         width: 100%;
+        display: flex;
+        gap: 5px;
       }
 
       @keyframes spin {
@@ -152,6 +159,7 @@
       }
       .text-bottom {
         padding-top: 30px;
+        padding-bottom: 30px;
       }
       .leaflet-left.leaflet-control {
         margin: 0;
@@ -315,15 +323,17 @@
           align-items: center;
         }
       }
+      .filter-data {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
     </style>
   </head>
   <body>
     <div class="header">
       <div class="wrapper">
-        <img
-          src="https://unicefstorage.blob.core.windows.net/hwstorage/unicef-logo.webp"
-          alt="UNICEF Logo"
-        />
+        <img src="./img/header.png" alt="UNICEF Logo" />
       </div>
     </div>
     <div class="wrapper">
@@ -333,25 +343,25 @@
           <h1 class="title">Heatwave Indicators</h1>
           <div class="logo-container">
             <p>Developed in collaboration with</p>
-            <img src="img/logo.svg" alt="logo" class="tryo" />
+            <img src="./img/logo.svg" alt="logo" class="tryo" />
           </div>
         </div>
         <p class="subtitle">
-          Discover heatwave increases and their effects on children (1960-2020)
+          Tracking heatwave indicators and children's exposure (1960-2020)
         </p>
       </div>
       <!-- Control panel for selecting year and sub-indicators, and download button -->
       <div class="pages-buttons">
-        <a href="/heatwaves/index.html">
+        <a href="./index.html">
           <button class="custom-button-active">Climate Indicators</button>
         </a>
-        <a href="/heatwaves/childexposure.html">
+        <a href="./childexposure.html">
           <button class="custom-button">Children's Exposure</button>
         </a>
       </div>
       <div class="container">
         <div class="filters" id="controls">
-          <div>
+          <div class="filter-data">
             <p>EXPLORE DATA</p>
             <p>
               Use the filters to explore heatwave data by decade and specific
@@ -411,8 +421,8 @@
       </div>
       <div class="text-bottom">
         <p>
-          The data presented on this page is sourced from lorem ipsum © <br />
-          UNICEF | Tryolabs 2024
+          The data presented on this page is sourced from lorem ipsum <br />
+          © UNICEF | Tryolabs 2024
         </p>
       </div>
     </div>
@@ -504,7 +514,7 @@
           var legend = document.getElementById("legend");
           var bandSelector = document.getElementById("bandSelector");
           var band = bandSelector.options[bandSelector.selectedIndex].text;
-          legend.innerHTML = `<strong>Color Scale | ${band}</strong> `;
+          legend.innerHTML = `<div class="lead-title">Color Scale | <div><i>${band}</i></div></div>`;
 
           // Calculate the range step size
           const stepSize = (max - min) / steps;
@@ -515,8 +525,8 @@
             const rangeMax = min + (i + 1) * stepSize;
 
             legend.innerHTML += `
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; ">
-               <div style="background-color:  ${scale(
+            <div style="display: flex; flex-direction: column;  align-items: center; gap: 4px; ">
+               <div style=" border: 0.5px solid white; background-color:  ${scale(
                  rangeMin
                )}; width: 20px; height: 20px;"></div> 
                 <div style="width: 100%; font-size: 10px;">${rangeMin.toFixed(
@@ -528,7 +538,7 @@
           // Add a new color box for values higher than the max
           legend.innerHTML += `
           <div style="display: flex; flex-direction: column; font-size: 10px; gap: 4px;">
-                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; "></div>
+                    <div style="background-color: ${overflowColor}; border: 1px solid white; width: 20px; height: 20px; "></div>
                     <div>${max}+</div>
                   </div> `;
         }

@@ -67,12 +67,13 @@
         display: flex;
         align-items: center;
         background-color: #0093ef;
-        padding: 30px;
+        padding-top: 30px;
+        padding-bottom: 30px;
         width: 100% !important;
       }
 
       .header img {
-        height: 25px;
+        height: 30px;
       }
 
       #content {
@@ -88,7 +89,6 @@
         height: 25px !important;
         line-height: 25px !important;
       }
-
       .custom-button {
         border: none;
         color: #000000;
@@ -98,6 +98,9 @@
         background: #d0d0d033;
         border-bottom: 5px solid #d0d0d005;
         transition: all.3s;
+        border-top: 1px solid #f1f1f1;
+        border-left: 1px solid #f1f1f1;
+        border-right: 1px solid #f1f1f1;
       }
       .leaflet-touch.leaflet-control-geocoder {
         min-width: 20px !important;
@@ -168,6 +171,8 @@
       }
       .text-bottom {
         padding-top: 30px;
+        padding-bottom: 30px;
+        line-height: 20px;
       }
       .leaflet-left.leaflet-control {
         margin: 0;
@@ -193,7 +198,10 @@
         margin-bottom: 34px;
         margin-top: 34px;
       }
-
+      .text-numbers {
+        font-weight: 400;
+        line-height: 20px;
+      }
       .title {
         margin: 0;
       }
@@ -279,6 +287,11 @@
         flex-direction: column;
         align-items: center;
       }
+      .filter-data {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
       .pages-buttons {
         position: relative;
       }
@@ -339,10 +352,7 @@
   <body>
     <div class="header">
       <div class="wrapper">
-        <img
-          src="https://unicefstorage.blob.core.windows.net/hwstorage/unicef-logo.webp"
-          alt="UNICEF Logo"
-        />
+        <img src="./img/header.png" alt="UNICEF Logo" />
       </div>
     </div>
     <div class="wrapper">
@@ -352,7 +362,7 @@
           <h1>Heatwave trends explorer</h1>
           <div class="logo-container">
             <p>Developed in collaboration with</p>
-            <img src="/heatwaves/img/logo.svg" alt="logo" class="tryo" />
+            <img src="./img/logo.svg" alt="logo" class="tryo" />
           </div>
         </div>
         <p class="subtitle">
@@ -360,17 +370,17 @@
         </p>
       </div>
       <div class="pages-buttons">
-        <a href="/heatwaves/index.html">
+        <a href="./index.html">
           <button class="custom-button">Climate Indicators</button>
         </a>
-        <a href="/heatwaves/childexposure.html">
+        <a href="./childexposure.html">
           <button class="custom-button-active">Children's Exposure</button>
         </a>
       </div>
       <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
       <div class="container">
         <div class="filters" id="controls">
-          <div>
+          <div class="filter-data">
             <p>EXPLORE DATA</p>
             <p>
               Click on a country on the map to visualize how many children are
@@ -421,8 +431,8 @@
       </div>
       <div class="text-bottom">
         <p>
-          The data presented on this page is sourced from lorem ipsum © <br />
-          UNICEF | Tryolabs 2024
+          The data presented on this page is sourced from lorem ipsum <br />
+          © UNICEF | Tryolabs 2024
         </p>
       </div>
     </div>
@@ -440,14 +450,14 @@
         // initalize leaflet map
         var defaultView = [40, 0];
         var defaultZoom = 2;
-        var map = L.map('map', {
+        var map = L.map("map", {
           minZoom: 2,
           maxZoom: 18,
           worldCopyJump: false, // Prevents the map from wrapping around
         }).setView(defaultView, defaultZoom);
 
         // add OpenStreetMap basemap
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
           noWrap: true,
           attribution:
             '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
@@ -458,25 +468,25 @@
           defaultMarkGeocode: false,
         }).addTo(map);
 
-        geocoder.on('markgeocode', function (e) {
+        geocoder.on("markgeocode", function (e) {
           var center = e.geocode.center;
           map.setView(center, 4);
         });
 
         var geojsonLayer;
         var geojsonData;
-        var currentYear = '2023';
+        var currentYear = "2023";
 
         // URLs for geojson files by year
         const geojsonUrls = {
-          2023: 'https://unicefstorage.blob.core.windows.net/hwstorage/child_exposure_2023_unicef.geojson',
+          2023: "https://unicefstorage.blob.core.windows.net/hwstorage/child_exposure_2023_unicef.geojson",
         };
 
-        const loadingDiv = document.getElementById('loading');
+        const loadingDiv = document.getElementById("loading");
 
         // Helper function to show or hide loading spinner
         function toggleSpinner(show) {
-          loadingDiv.style.display = show ? 'block' : 'none';
+          loadingDiv.style.display = show ? "block" : "none";
         }
 
         // Function to update the map based on selected filters
@@ -490,10 +500,10 @@
 
           geojsonLayer = L.geoJson(geojsonData, {
             onEachFeature: function (feature, layer) {
-              var countryName = feature.properties['Country Name'];
+              var countryName = feature.properties["Country Name"];
               var value =
                 feature.properties[
-                  subIndicator + ' Increased by ' + percentage
+                  subIndicator + " Increased by " + percentage
                 ];
 
               // Create popup content
@@ -525,9 +535,9 @@
           }).addTo(map);
 
           // Display the sum below the map
-          var sumDisplay = document.getElementById('sum-display');
+          var sumDisplay = document.getElementById("sum-display");
           sumDisplay.innerHTML = `
-                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.
+                   <div class="text-numbers"> Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.</div>
                 `;
         }
 
@@ -543,13 +553,13 @@
             })
             .catch((error) => {
               toggleSpinner(false);
-              console.error('Error loading the GeoJSON file:', error);
+              console.error("Error loading the GeoJSON file:", error);
             });
         }
 
         // Initial load
         loadGeojsonForYear(currentYear, function () {
-          updateMap('Heatwave Frequency', '50%');
+          updateMap("Heatwave Frequency", "50%");
         });
 
         // Event listeners for the filters
@@ -568,34 +578,34 @@
         //     }
         //   });
         document
-          .getElementById('sub-indicator')
-          .addEventListener('change', function () {
+          .getElementById("sub-indicator")
+          .addEventListener("change", function () {
             var subIndicator = this.value;
-            var percentage = document.getElementById('percentage').value;
+            var percentage = document.getElementById("percentage").value;
             updateMap(subIndicator, percentage);
           });
 
         document
-          .getElementById('percentage')
-          .addEventListener('change', function () {
-            var subIndicator = document.getElementById('sub-indicator').value;
+          .getElementById("percentage")
+          .addEventListener("change", function () {
+            var subIndicator = document.getElementById("sub-indicator").value;
             var percentage = this.value;
             updateMap(subIndicator, percentage);
           });
 
         // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
         document
-          .getElementById('downloadBtn')
-          .addEventListener('click', function () {
-            var selectedYear = document.getElementById('yearDropdown').value;
+          .getElementById("downloadBtn")
+          .addEventListener("click", function () {
+            var selectedYear = document.getElementById("yearDropdown").value;
             var csvUrl = `https://unicefstorage.blob.core.windows.net/hwstorage/Exposure_change_for_Countries_${selectedYear}.csv`;
-            window.open(csvUrl, '_blank');
+            window.open(csvUrl, "_blank");
           });
 
         // Event listener for reset view button click
         document
-          .getElementById('reset-view')
-          .addEventListener('click', function () {
+          .getElementById("reset-view")
+          .addEventListener("click", function () {
             map.setView(defaultView, defaultZoom);
           });
       })();
