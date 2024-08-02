@@ -262,7 +262,7 @@
                         // Create popup content
                         var popupContent;
 
-                        if (value === 0) {
+                        if (value === 0) { // change here if different value is used for NO DATA
                             popupContent = `
                                 <div class="popup-header">In <strong>${countryName}</strong></div>
                                 <div class="popup-content">
@@ -273,7 +273,7 @@
                             popupContent = `
                                 <div class="popup-header">In <strong>${countryName}</strong></div>
                                 <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children (${value_percentage}% of total) live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
+                                    <strong>${value.toLocaleString()}</strong> children (~${value_percentage}% of total) live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
                                 </div>
                             `;
                         }
