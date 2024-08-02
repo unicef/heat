@@ -23,7 +23,7 @@ button {
     width: 100%;
     align-items: center;
     justify-content: space-between;
-    padding: 9px 20px;
+    padding: 13px 20px 10px 20px;
     box-shadow: 4px 4px 5.2px 0px #00000014;
     border-radius: 4px;
     cursor: pointer;
@@ -78,8 +78,8 @@ button {
           position: relative;
           z-index: 1;
           display: flex;
-          align-items:center;
-          justify-content:center;
+          align-items: center;
+          justify-content: center;
 
           p {
             position: absolute;
