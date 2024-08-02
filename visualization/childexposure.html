@@ -65,7 +65,7 @@
       .header {
         display: flex;
         align-items: center;
-        background-color: #1cabe2;
+        background-color: #0093ef;
         padding: 30px;
         width: 100% !important;
       }
@@ -300,9 +300,10 @@
         padding: 10px 30px;
         border-radius: 4px;
         z-index: 100000;
-        animation-duration: 0.5s;
+        transition: all 0.2s;
       }
       .buttonReset:hover {
+        transition: all 0.2s;
         background: #ffffff;
       }
       .align-scale {
@@ -353,11 +354,9 @@
       }
       .tryo {
         height: 20px;
-      }
-      .tryo,
-      img {
         margin-left: 10px;
       }
+
       .logo-container {
         display: flex;
         justify-content: space-between;
@@ -417,7 +416,7 @@
               <option value="Heatwave Frequency">Frequency</option>
               <option value="Heatwave Duration">Duration</option>
               <option value="Heatwave Severity">Severity</option>
-              <option value="Extreme Heat Days">Extreme High Temp.</option>
+              <option value="Extreme Heat Days">Extreme Heat days</option>
             </select>
           </div>
           <div class="filtersGap">

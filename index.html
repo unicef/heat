@@ -7,6 +7,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Leaflet CSS for map styling -->
+    <link rel="stylesheet" href="./styles/fonts.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -27,22 +28,18 @@
     <style>
       body,
       html {
-        font-family: "Roboto", sans-serif;
-        font-weight: 400;
-        font-style: normal;
         margin: 0 auto;
         overflow-x: hidden;
       }
       .header {
         display: flex;
         align-items: center;
-        background-color: #1cabe2;
+        background-color: #0093ef;
         padding: 30px;
-        width: 100% !important;
       }
 
       .header img {
-        height: 25px;
+        height: 30px;
       }
 
       #content {
@@ -252,9 +249,10 @@
         padding: 10px 30px;
         border-radius: 4px;
         z-index: 100000;
-        animation-duration: 0.5s;
+        transition: all 0.2s;
       }
       .buttonReset:hover {
+        transition: all 0.2s;
         background: #ffffff;
       }
       .align-scale {
@@ -302,8 +300,7 @@
         display: flex;
         text-align: center;
       }
-      .tryo,
-      img {
+      .tryo {
         margin-left: 10px;
         height: 20px;
       }
@@ -361,13 +358,13 @@
           <div class="filtersGap">
             <label for="yearDropdown">Decade</label>
             <select class="filterStyle" id="yearDropdown">
-              <option value="1960">1960</option>
-              <option value="1970">1970</option>
-              <option value="1980">1980</option>
-              <option value="1990">1990</option>
-              <option value="2000">2000</option>
-              <option value="2010">2010</option>
-              <option value="2020">2020</option>
+              <option value="1960">1960s</option>
+              <option value="1970">1970s</option>
+              <option value="1980">1980s</option>
+              <option value="1990">1990s</option>
+              <option value="2000">2000s</option>
+              <option value="2010">2010s</option>
+              <option value="2020">2020s</option>
             </select>
           </div>
           <div class="filtersGap">
@@ -376,7 +373,7 @@
               <option value="0">Frequency</option>
               <option value="1">Duration</option>
               <option value="2">Severity</option>
-              <option value="3">Extreme High Temp.</option>
+              <option value="3">Extreme Heat days.</option>
             </select>
           </div>
           <div>
