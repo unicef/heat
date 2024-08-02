@@ -74,28 +74,31 @@
     <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
     <div id="controls">
         <label for="yearDropdown">Year of the report:</label>
-        <select id="yearDropdown" disabled>
+        <select id="yearDropdown">
+            <option value="0">Select Year</option>
             <option value="2023">2023</option>
             <!-- Future options for other years can be added here -->
         </select>
 
-        <label for="sub-indicator">Select sub-indicator:</label>
+        <label for="sub-indicator">sub-indicator:</label>
         <select id="sub-indicator">
+            <option value="0">Select Sub-indicator</option>
             <option value="Heatwave Frequency">Frequency</option>
             <option value="Heatwave Duration">Duration</option>
             <option value="Heatwave Severity">Severity</option>
-            <option value="Extreme Heat Days">Extreme High Temp.</option>
+            <option value="Extreme Heat Days">Extreme Heat Days</option>
         </select>
 
-        <label for="percentage">Select percentage increase:</label>
+        <label for="percentage">Percentage Increase:</label>
         <select id="percentage">
+            <option value="0">Select Percentage Increase</option>
             <option value="50%">50%</option>
             <option value="100%">100%</option>
             <option value="200%">200%</option>
         </select>
 
         <!-- Button to download CSV and reset map view -->
-        <button id="downloadBtn" style="margin-left: 10px">Download CSV</button>
+        <button id="downloadBtn" disabled style="margin-left: 10px">Download CSV</button>
         <button id="reset-view">Reset View</button>
     </div>
 
@@ -158,7 +161,6 @@
 
             var geojsonLayer;
             var geojsonData;
-            var currentYear = "2023";
 
             // URLs for geojson files by year
             const geojsonUrls = {
@@ -295,58 +297,72 @@
             }
 
             // Load the GeoJSON file for the selected year
-            function loadGeojsonForYear(year, callback) {
-                toggleSpinner(true);
+            function loadGeojsonForYear(year, subIndicator, percentage, callback) {
+                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
+                    toggleSpinner(true);
 
-                var url = geojsonUrls[year];
+                    var url = geojsonUrls[year];
 
-                fetch(url, { cache: "force-cache" })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        geojsonData = data;
-                        if (callback) callback();
-                        toggleSpinner(false);
-                    })
-                    .catch((error) => {
-                        toggleSpinner(false);
-                        console.error("Error loading the GeoJSON file:", error);
-                    });
+                    fetch(url, { cache: "force-cache" })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            geojsonData = data;
+                            if (callback) callback();
+                            toggleSpinner(false);
+                        })
+                        .catch((error) => {
+                            toggleSpinner(false);
+                            console.error("Error loading the GeoJSON file:", error);
+                        });
+                } else {
+                    // Remove the GeoJSON layer if it exists
+                    if (geojsonLayer) {
+                        map.removeLayer(geojsonLayer);
+                        geojsonLayer = null;
+                    }
+                }
             }
 
-            // Initial load
-            loadGeojsonForYear(currentYear, function () {
-                updateMap("Heatwave Frequency", "50%");
-            });
+            // Helper function to update map based on the selected filters
+            function updateFilters() {
+                var year = document.getElementById("yearDropdown").value;
+                var subIndicator = document.getElementById("sub-indicator").value;
+                var percentage = document.getElementById("percentage").value;
+
+                loadGeojsonForYear(year, subIndicator, percentage, function () {
+                    updateMap(subIndicator, percentage);
+                });
+            }
+
+            //helper function to enable download botton when all filters are selected
+            function updateButtonState() {
+                var year = document.getElementById("yearDropdown").value;
+                var subIndicator = document.getElementById("sub-indicator").value;
+                var percentage = document.getElementById("percentage").value;
+
+                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
+                    downloadBtn.disabled = false;
+                } else {
+                    downloadBtn.disabled = true;
+                }
+            }
 
             // Event listeners for the filters
             document
                 .getElementById("yearDropdown")
                 .addEventListener("change", function () {
-                    var selectedYear = this.value;
-                    if (selectedYear !== currentYear) {
-                        currentYear = selectedYear;
-                        loadGeojsonForYear(currentYear, function () {
-                            var subIndicator =
-                                document.getElementById("sub-indicator").value;
-                            var percentage = document.getElementById("percentage").value;
-                            updateMap(subIndicator, percentage);
-                        });
-                    }
+                    updateFilters();
+                    updateButtonState();
                 });
-            document
-                .getElementById("sub-indicator")
+            document.getElementById("sub-indicator")
                 .addEventListener("change", function () {
-                    var subIndicator = this.value;
-                    var percentage = document.getElementById("percentage").value;
-                    updateMap(subIndicator, percentage);
+                    updateFilters();
+                    updateButtonState();
                 });
-
-            document
-                .getElementById("percentage")
+            document.getElementById("percentage")
                 .addEventListener("change", function () {
-                    var subIndicator = document.getElementById("sub-indicator").value;
-                    var percentage = this.value;
-                    updateMap(subIndicator, percentage);
+                    updateFilters();
+                    updateButtonState();
                 });
 
             // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
