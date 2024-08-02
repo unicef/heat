@@ -323,6 +323,7 @@
                     onTileLoadError: function () {
                         toggleSpinner(false);
                         alert("Failed to load data. Please try again.");
+                        map.removeLayer(currentLayer);
                     },
                     // Assign colors to individual pixels based on their value
                     pixelValuesToColorFn: function (pixelValues) {
@@ -372,6 +373,7 @@
                         .catch(() => {
                             toggleSpinner(false);
                             alert("Failed to load data. Please try again.");
+                            map.removeLayer(currentLayer);
                         });
                 } else {
                     if (currentLayer) {
