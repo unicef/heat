@@ -25,8 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = option.querySelector('span').innerHTML;
         selected.innerHTML = text;
         close();
-        options.forEach((o) => o.classList.remove('active'));
+        options.forEach((o) => {
+          o.classList.remove('active');
+          o.closest('li').classList.remove('active');
+        });
         option.classList.add('active');
+        option.closest('li').classList.add('active');
         input.value = option.dataset.value;
         input.dispatchEvent(new Event('change'));
       });

@@ -62,6 +62,10 @@ button {
         z-index: 2;
       }
 
+      &.active {
+        display: none;
+      }
+
       button {
         padding: 0;
         padding: 9px 20px;
