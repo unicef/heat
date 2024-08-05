@@ -14,7 +14,7 @@ This project aims at producing heatwave indicators globally and measure the expo
 
 **Extreme high temperature**: Annual average number of days in which 35°C is exceeded.
 
-![image](docs/img/hw_difinitions.png)
+![image](docs/img/hw_definitions.png)
 
 ## Data
 
