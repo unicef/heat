@@ -80,7 +80,7 @@ Heatwave Severity : 0.88
 
 Extreme Temperature Days : 51.68
 
-- - High values, very high values and Extreme high values are defined as below
+- High values, very high values and Extreme high values are defined as below
 
 High : > Mean + 1STD (about upper 16%)
 
