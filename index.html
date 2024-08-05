@@ -62,7 +62,7 @@
         border: none;
         color: #000000;
         cursor: pointer;
-        padding: 24px 10px;
+        padding: 20px 10px 16px 10px;
         border-radius: 20px 20px 0px 0px;
         background: #d0d0d033;
         border-bottom: 5px solid #d0d0d005;
@@ -95,7 +95,7 @@
         border: none;
         color: #000000;
         cursor: pointer;
-        padding: 24px 10px;
+        padding: 20px 10px 16px 10px;
         border-radius: 20px 20px 0px 0px;
         border-bottom: 5px solid #0093ef;
       }
@@ -247,12 +247,13 @@
         line-height: 14.06px;
         font-size: 12px;
         letter-spacing: 2.4px;
+        cursor: pointer;
       }
       .buttonReset {
         position: absolute;
         top: 0;
         right: 0;
-        background: #d0d0d0;
+        background: #ffffff;
         display: flex;
         color: #878787;
         border: transparent;
@@ -261,10 +262,7 @@
         border-radius: 4px;
         z-index: 100000;
         transition: all 0.2s;
-      }
-      .buttonReset:hover {
-        transition: all 0.2s;
-        background: #ffffff;
+        cursor: pointer;
       }
       .align-scale {
         display: flex;
@@ -340,7 +338,7 @@
       <!-- Website title -->
       <div class="titleBox">
         <div class="logo">
-          <h1 class="title">Heatwave Indicators</h1>
+          <h1 class="title">Heatwave trends explorer</h1>
           <div class="logo-container">
             <p>Developed in collaboration with</p>
             <img src="./img/logo.svg" alt="logo" class="tryo" />
@@ -353,7 +351,7 @@
       <!-- Control panel for selecting year and sub-indicators, and download button -->
       <div class="pages-buttons">
         <a href="./index.html">
-          <button class="custom-button-active">Climate Indicators</button>
+          <button class="custom-button-active">Heatwave indicators</button>
         </a>
         <a href="./childexposure.html">
           <button class="custom-button">Children's Exposure</button>
@@ -383,10 +381,14 @@
           <div class="filtersGap">
             <label for="bandSelector">Indicator</label>
             <select class="filterStyle" id="bandSelector">
-              <option value="0">Frequency</option>
-              <option value="1">Duration</option>
-              <option value="2">Severity</option>
-              <option value="3">Extreme Heat days.</option>
+              <option title="Frequency" value="0">Frequency</option>
+              <option title="Duration in days" value="1">Duration</option>
+              <option title="Severity in degrees celsius" value="2">
+                Severity
+              </option>
+              <option title="Extreme heat days in days" value="3">
+                Extreme Heat days
+              </option>
             </select>
           </div>
           <div>
@@ -513,7 +515,7 @@
         function updateLegend(min, max, steps, scale, overflowColor) {
           var legend = document.getElementById("legend");
           var bandSelector = document.getElementById("bandSelector");
-          var band = bandSelector.options[bandSelector.selectedIndex].text;
+          var band = bandSelector.options[bandSelector.selectedIndex].title;
           legend.innerHTML = `<div class="lead-title">Color Scale | <div><i>${band}</i></div></div>`;
 
           // Calculate the range step size
@@ -538,7 +540,7 @@
           // Add a new color box for values higher than the max
           legend.innerHTML += `
           <div style="display: flex; flex-direction: column; font-size: 10px; gap: 4px;">
-                    <div style="background-color: ${overflowColor}; border: 1px solid white; width: 20px; height: 20px; "></div>
+                    <div style="background: ${overflowColor}; border: 1px solid white; width: 20px; height: 20px;"></div>
                     <div>${max}+</div>
                   </div> `;
         }
@@ -549,7 +551,7 @@
           const { min, max } = bandRanges[band];
           const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
           const colorLookup = scale.colors(steps); // Create a lookup table for colors
-          const overflowColor = "#f1f1f1";
+          const overflowColor = "#500000";
 
           if (!currentGeoRaster) return; // Abort if there is no data available.
 
