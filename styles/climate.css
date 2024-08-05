@@ -237,6 +237,7 @@ a.leaflet-control-zoom-in {
   padding: 10px 30px;
   border-radius: 4px;
   z-index: 100000;
+  cursor: pointer;
   transition: all 0.2s;
 }
 .align-scale {
