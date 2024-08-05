@@ -1,0 +1,303 @@
+body,
+html {
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #0093ef;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.header img {
+  height: 30px;
+}
+
+#content {
+  margin-top: 20px;
+}
+.leaflet-control-zoom-in {
+  width: 20px !important;
+  height: 25px !important;
+  line-height: 25px !important;
+}
+.leaflet-control-zoom-out.leaflet-disabled {
+  width: 20px !important;
+  height: 25px !important;
+  line-height: 25px !important;
+}
+
+.custom-button {
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  padding: 24px 10px 16px 10px;
+  border-radius: 20px 20px 0px 0px;
+  background: #d0d0d033;
+  border-bottom: 5px solid #d0d0d005;
+  transition: all.3s;
+  border-top: 1px solid #f1f1f1;
+  border-left: 1px solid #f1f1f1;
+  border-right: 1px solid #f1f1f1;
+}
+.leaflet-touch.leaflet-control-geocoder {
+  min-width: 20px !important;
+  min-height: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+.custom-button:hover {
+  background: #d0d0d080;
+  transition: all.3s;
+}
+
+.leaflet-control-geocoder.leaflet-bar.leaflet-control {
+  min-width: 20px !important;
+  min-height: 20px !important;
+}
+.leaflet-control-geocoder-icon {
+  width: 20px !important;
+  height: 20px !important ;
+}
+.custom-button-active {
+  background: #d0d0d080;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  padding: 24px 10px 16px 10px;
+  border-radius: 20px 20px 0px 0px;
+  border-bottom: 5px solid #0093ef;
+}
+#map {
+  position: relative;
+  height: 600px;
+  width: 100%;
+  border-radius: 10px;
+  z-index: 2;
+}
+
+#legend {
+  z-index: 1001;
+  display: flex;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+#legend .lead-title {
+  width: 100%;
+  display: flex;
+  gap: 5px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.scale {
+  display: flex;
+  gap: 13px;
+}
+#loading {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+}
+
+.spinner {
+  margin: 0 auto;
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #1cabe2;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+
+.leaflet-container {
+  background-color: rgba(255, 0, 0, 0);
+}
+.text-bottom {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.leaflet-left.leaflet-control {
+  margin: 0;
+}
+.leaflet-control-geocoder.leaflet-bar.leaflet-control {
+  left: initial;
+  top: 3.5rem;
+  right: 0.9rem;
+}
+.leaflet-top.leaflet-left {
+  left: initial;
+  top: 6rem;
+  right: 1.5rem;
+}
+.leaflet-touch.leaflet-bar a {
+  width: 20px !important;
+  height: 30px !important;
+}
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 34px;
+  margin-top: 34px;
+}
+
+.title {
+  margin: 0;
+}
+.subtitle {
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 21px 30px;
+  background: #f5f5f5;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  max-width: 380px;
+}
+
+.filtersGap {
+  display: flex;
+  gap: 14px;
+  flex-direction: column;
+}
+a.leaflet-control-zoom-out {
+  width: 20px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+}
+a.leaflet-control-zoom-in {
+  width: 20px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+}
+.container {
+  display: flex;
+  background: #f1f1f1;
+  gap: 19px;
+  padding: 20px;
+  @media screen and (max-width: 1240px) {
+    flex-direction: column;
+  }
+}
+
+.filterStyle {
+  padding: 10px 20px;
+  display: flex;
+  box-shadow: 4px 4px 5.2px 0px #00000014;
+  border: 0px;
+  border-radius: 4px;
+  opacity: 80%;
+}
+
+.buttonDownload {
+  color: #f5f5f5;
+  background: #0093ef;
+  border: transparent;
+  width: fit-content;
+  padding: 13px 19px;
+  line-height: 14.06px;
+  font-size: 12px;
+  letter-spacing: 2.4px;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+.buttonReset {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ffffff;
+  display: flex;
+  color: #878787;
+  border: transparent;
+  margin: 20px;
+  padding: 10px 30px;
+  border-radius: 4px;
+  z-index: 100000;
+  transition: all 0.2s;
+}
+.align-scale {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pages-buttons {
+  position: relative;
+}
+.wrapper {
+  padding-left: 255px;
+  padding-right: 255px;
+  @media screen and (max-width: 1600px) {
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+  @media screen and (max-width: 1400px) {
+    padding-left: 150px;
+    padding-right: 150px;
+  }
+  @media screen and (max-width: 1000px) {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
+  @media screen and (max-width: 700px) {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+  @media screen and (max-width: 700px) {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+.logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @media screen and (max-width: 850px) {
+    flex-direction: column;
+    align-items: baseline;
+  }
+}
+.logo-text {
+  display: flex;
+  text-align: center;
+}
+.tryo {
+  margin-left: 10px;
+  height: 20px;
+}
+.logo-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @media screen and (max-width: 850px) {
+    align-items: center;
+  }
+}
+.filter-data {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
