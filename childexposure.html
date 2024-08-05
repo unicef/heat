@@ -93,7 +93,7 @@
         border: none;
         color: #000000;
         cursor: pointer;
-        padding: 24px 10px;
+        padding: 20px 10px 16px 10px;
         border-radius: 20px 20px 0px 0px;
         background: #d0d0d033;
         border-bottom: 5px solid #d0d0d005;
@@ -125,7 +125,7 @@
         border: none;
         color: #000000;
         cursor: pointer;
-        padding: 24px 10px;
+        padding: 20px 10px 16px 10px;
         border-radius: 20px 20px 0px 0px;
         border-bottom: 5px solid #0093ef;
       }
@@ -263,12 +263,13 @@
         line-height: 14.06px;
         font-size: 12px;
         letter-spacing: 2.4px;
+        cursor: pointer;
       }
       .buttonReset {
         position: absolute;
         top: 0;
         right: 0;
-        background: #d0d0d0;
+        background: #ffffff;
         display: flex;
         color: #878787;
         border: transparent;
@@ -276,11 +277,8 @@
         padding: 10px 30px;
         border-radius: 4px;
         z-index: 100000;
-        transition: all 0.2s;
-      }
-      .buttonReset:hover {
-        transition: all 0.2s;
-        background: #ffffff;
+
+        cursor: pointer;
       }
       .align-scale {
         display: flex;
@@ -371,7 +369,7 @@
       </div>
       <div class="pages-buttons">
         <a href="./index.html">
-          <button class="custom-button">Climate Indicators</button>
+          <button class="custom-button">Heatwave indicators</button>
         </a>
         <a href="./childexposure.html">
           <button class="custom-button-active">Children's Exposure</button>
@@ -518,9 +516,9 @@
                             `;
               } else {
                 popupContent = `
-                                <div class="popup-header">In <strong>${countryName}</strong></div>
+                                <div class="popup-header">In <strong>${countryName},</strong></div>
                                 <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s<br>
+                                    <strong>${value.toLocaleString()}</strong> children live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
                                 </div>
                             `;
               }
@@ -537,10 +535,9 @@
           // Display the sum below the map
           var sumDisplay = document.getElementById("sum-display");
           sumDisplay.innerHTML = `
-                   <div class="text-numbers"> Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <span>${subIndicator}</span> has increased by <span>${percentage}</span> since the 1960s.</div>
+                   <div class="text-numbers"> Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s.</div>
                 `;
         }
-
         // Load the GeoJSON file for the selected year
         function loadGeojsonForYear(year, callback) {
           toggleSpinner(true);
