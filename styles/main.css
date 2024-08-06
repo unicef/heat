@@ -262,7 +262,7 @@ a.leaflet-control-zoom-in {
   cursor: pointer;
   transition: all 0.3s;
 
-  [disabled] {
+  &[disabled] {
     opacity: .5;
     pointer-events: none;
   }
