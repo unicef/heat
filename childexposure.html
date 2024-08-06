@@ -295,7 +295,7 @@
 
         // URLs for geojson files by year
         const geojsonUrls = {
-          2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
+          2023: "http://dev.estudionk.com:3511/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
         };
 
         // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
@@ -501,6 +501,7 @@
           var subIndicator = document.getElementById("sub-indicator").value;
           var percentage = document.getElementById("percentage").value;
 
+          console.log(year, subIndicator, percentage);
           if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
             downloadBtn.disabled = false;
           } else {
