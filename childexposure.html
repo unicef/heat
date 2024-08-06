@@ -224,7 +224,9 @@
           <div id="legend"></div>
           <div style="line-height: 20px" class="border" id="sum-display"></div>
           <!-- Button to download CSV and reset map view -->
-          <button class="buttonDownload" id="downloadBtn" disabled>DOWNLOAD .CSV</button>
+          <button class="buttonDownload" id="downloadBtn" disabled>
+            DOWNLOAD .CSV
+          </button>
         </div>
 
         <!-- Map container -->
@@ -295,7 +297,7 @@
 
         // URLs for geojson files by year
         const geojsonUrls = {
-          2023: "http://dev.estudionk.com:3511/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
+          2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
         };
 
         // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
