@@ -548,7 +548,7 @@
 
         // Load the TIFF file for the selected decade
         function loadTiff(decade, hwi) {
-          if (decade !== "0" && hwi !== "0") {
+          if (decade && hwi) {
             toggleSpinner(true);
 
             console.log(decade, hwi, tiffUrls[decade][hwi]);
