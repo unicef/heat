@@ -500,9 +500,10 @@
           var year = document.getElementById("yearDropdown").value;
           var subIndicator = document.getElementById("sub-indicator").value;
           var percentage = document.getElementById("percentage").value;
+          var downloadBtn = document.getElementById("downloadBtn");
 
           console.log(year, subIndicator, percentage);
-          if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
+          if (year && subIndicator && percentage) {
             downloadBtn.disabled = false;
           } else {
             downloadBtn.disabled = true;
