@@ -54,7 +54,7 @@ p {
 }
 #map {
   position: relative;
-  height: 600px;
+  min-height: 600px;
   width: 100%;
   border-radius: 10px;
   z-index: 2;
