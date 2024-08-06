@@ -24,9 +24,6 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
     />
-    <!-- Leaflet CSS for map styling -->
-
-    <!-- Styles for the map and UI elements -->
   </head>
   <body>
     <div class="header">
@@ -67,9 +64,9 @@
             </p>
           </div>
           <div class="filtersGap">
-            <label for="yearDropdown">Decade</label>
+            <label for="decadeDropdown">Decade</label>
             <div class="dropdown">
-              <input type="hidden" id="yearDropdown" value="2020" />
+              <input type="hidden" id="decadeDropdown" value="2020" />
               <button class="dropdown-trigger">
                 <span>Select decade</span>
                 <svg
@@ -136,7 +133,7 @@
           <div class="filtersGap">
             <label for="bandSelector">Indicator</label>
             <div class="dropdown">
-              <input type="hidden" id="bandSelector" value="0" />
+              <input type="hidden" id="hwiSelector" value="0" />
               <button class="dropdown-trigger">
                 <span>Select indicator</span>
                 <svg
@@ -218,7 +215,6 @@
             DOWNLOAD .TIFF
           </button>
         </div>
-
         <!-- Map container -->
         <div id="map">
           <!-- Loading message container -->
@@ -235,8 +231,6 @@
               <p style="text-align: center; margin-top: 10px">Loading...</p>
             </div>
           </div>
-          <!-- Color scale legend container -->
-
           <button class="buttonReset" id="reset-view">RESET ZOOM</button>
         </div>
       </div>
@@ -247,19 +241,17 @@
         </p>
       </div>
     </div>
-    <!-- import necessary scripts -->
+    <!-- Import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="./js/dropdown.js"></script>
-
     <script>
       (function () {
         // This is to be able to embed the script into the index.html
         // initalize leaflet map
-
         var defaultView = [40, 0];
         var defaultZoom = 2;
         var map = L.map("map", {
@@ -285,30 +277,94 @@
           map.setView(center, 4);
         });
 
-        // URLs for TIFF files by year
+        // URLs for TIFF files by decade and sub-indicator
         const tiffUrls = {
-          1960: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1960s_proj_COG2.tif",
-          1970: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1970s_proj_COG2.tif",
-          1980: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1980s_proj_COG2.tif",
-          1990: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_1990s_proj_COG2.tif",
-          2000: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2000s_proj_COG2.tif",
-          2010: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2010s_proj_COG2.tif",
-          2020: "https://unicefstorage.blob.core.windows.net/hwstorage/average_hwi_2020s_proj_COG2.tif",
+          1960: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1960s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1960s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1960s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1960s_proj_COG.tif",
+          },
+          1970: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1970s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1970s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1970s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1970s_proj_COG.tif",
+          },
+          1980: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1980s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1980s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1980s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1980s_proj_COG.tif",
+          },
+          1990: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1990s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1990s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1990s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1990s_proj_COG.tif",
+          },
+          2000: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_2000s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_2000s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_2000s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_2000s_proj_COG.tif",
+          },
+          2010: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_2010s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_2010s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_2010s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_2010s_proj_COG.tif",
+          },
+          2020: {
+            frequency:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_2020s_proj_COG.tif",
+            duration:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_2020s_proj_COG.tif",
+            severity:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_2020s_proj_COG.tif",
+            extreme_high_temp:
+              "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_2020s_proj_COG.tif",
+          },
         };
 
         // Maximum and minimum values per band are determined by calculating the mean and standard deviation for 2020.
         // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
         // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
-        const bandRanges = {
-          0: { min: 0, max: 15 }, // Frequency
-          1: { min: 0, max: 79 }, // Duration
-          2: { min: 0, max: 4 }, // Severity
-          3: { min: 0, max: 112 }, // Extreme High Temp.
+        const hwiRanges = {
+          frequency: { min: 0, max: 15 },
+          duration: { min: 0, max: 79 },
+          severity: { min: 0, max: 4 },
+          extreme_high_temp: { min: 0, max: 112 },
         };
 
         var currentLayer,
           currentGeoRaster,
           currentBand = 0;
+
         const loadingDiv = document.getElementById("loading");
 
         // Helper function to show or hide loading spinner
@@ -334,11 +390,11 @@
         // Helper function to update the legend with color scale
         function updateLegend(min, max, steps, scale, overflowColor) {
           var legend = document.getElementById("legend");
-          var bandSelector = document.getElementById("bandSelector");
-          var band = bandSelector
+          var hwiSelector = document.getElementById("hwiSelector");
+          var band = hwiSelector
             .closest(".dropdown")
-            .querySelector(".active span").innerHTML;
-          legend.innerHTML = `<strong>Color Scale | ${band}</strong> `;
+            .querySelector(".active button").title;
+          legend.innerHTML = `<div class="lead-title">Color Scale | <div><i>${band}</i></div></div>`;
 
           // Calculate the range step size
           const stepSize = (max - min) / steps;
@@ -368,16 +424,18 @@
         }
 
         // Add raster layer to the map and update the legend with color scale
-        function addLayer(band) {
+        function addRasterLayer(hwi) {
           const steps = 5;
-          const { min, max } = bandRanges[band];
+          const { min, max } = hwiRanges[hwi];
           const scale = chroma.scale("OrRd").domain([min, max]).classes(steps);
           const colorLookup = scale.colors(steps); // Create a lookup table for colors
-          const overflowColor = "#f1f1f1";
+          const overflowColor = "#500000";
+          if (!currentGeoRaster) {
+            document.getElementById("legend").innerHTML = "";
+            return; // Abort if there is no data available.
+          }
 
-          if (!currentGeoRaster) return; // Abort if there is no data available.
-
-          updateLegend(min, max, steps, scale, overflowColor);
+          updateLegend(min, max, steps, colorLookup, overflowColor);
 
           // Remove previous layer (if any)
           if (currentLayer) {
@@ -400,10 +458,13 @@
             onTileLoadError: function () {
               toggleSpinner(false);
               alert("Failed to load data. Please try again.");
+              map.removeLayer(currentLayer);
+              document.getElementById("legend").innerHTML = "";
             },
             // Assign colors to individual pixels based on their value
             pixelValuesToColorFn: function (pixelValues) {
-              var pixelValue = pixelValues[band];
+              var pixelValue = pixelValues[0];
+
               if (
                 pixelValue === 0 ||
                 pixelValue === null ||
@@ -429,52 +490,84 @@
           // map.fitBounds(currentLayer.getBounds());
         }
 
-        // Load the TIFF file for the selected year
-        function loadTiffForYear(year) {
-          toggleSpinner(true);
+        // Load the TIFF file for the selected decade
+        function loadTiff(decade, hwi) {
+          if (decade !== "0" && hwi !== "0") {
+            toggleSpinner(true);
 
-          fetch(tiffUrls[year])
-            .then((response) => response.arrayBuffer())
-            .then((arrayBuffer) => {
-              parseGeoraster(arrayBuffer).then((georaster) => {
-                currentGeoRaster = georaster;
-                addLayer(currentBand);
+            var url = tiffUrls[decade][hwi];
+
+            fetch(url, { cache: "force-cache" })
+              .then((response) => response.arrayBuffer())
+              .then((arrayBuffer) => {
+                parseGeoraster(arrayBuffer).then((georaster) => {
+                  currentGeoRaster = georaster;
+                  addRasterLayer(hwi);
+                  toggleSpinner(false);
+                });
+              })
+              .catch(() => {
                 toggleSpinner(false);
+                alert("Failed to load data. Please try again.");
+                map.removeLayer(currentLayer);
+                document.getElementById("legend").innerHTML = "";
               });
-            })
-            .catch(() => {
-              toggleSpinner(false);
-              alert("Failed to load data. Please try again.");
-            });
+          } else {
+            if (currentLayer) {
+              map.removeLayer(currentLayer);
+              document.getElementById("legend").innerHTML = "";
+            }
+          }
         }
 
-        // Initial load
-        loadTiffForYear(document.getElementById("yearDropdown").value);
+        // Helper function to update map based on the selected filters
+        function updateFilters() {
+          var selectedDecade = document.getElementById("decadeDropdown").value;
+          var selectedHwi = document.getElementById("hwiSelector").value;
+
+          loadTiff(selectedDecade, selectedHwi);
+        }
+
+        //helper function to enable download botton when all filters are selected
+        function updateButtonState() {
+          var selectedDecade = document.getElementById("decadeDropdown").value;
+          var selectedHwi = document.getElementById("hwiSelector").value;
+
+          if (selectedDecade !== "0" && selectedHwi !== "0") {
+            downloadBtn.disabled = false;
+          } else {
+            downloadBtn.disabled = true;
+          }
+        }
 
         // Event listeners for dropdown changes and button clicks
 
-        // Listen for a change event on the 'yearDropdown' element and call the loadTiffForYear with the newly selected year.
+        // Listen for a change event on the 'decadeDropdown' element and call the loadTiff with the newly selected decade.
         document
-          .getElementById("yearDropdown")
+          .getElementById("decadeDropdown")
           .addEventListener("change", function () {
-            var selectedYear = this.value;
-            loadTiffForYear(selectedYear);
+            updateFilters();
+            updateButtonState();
           });
 
-        // Listen for a change event on the 'bandSelector' element and call the addLayer function with the newly selected band.
+        // Listen for a change event on the 'hwiSelector' element and call the loadTiff with the newly selected decade.
         document
-          .getElementById("bandSelector")
-          .addEventListener("change", function (event) {
-            currentBand = parseInt(event.target.value);
-            addLayer(currentBand);
+          .getElementById("hwiSelector")
+          .addEventListener("change", function () {
+            updateFilters();
+            updateButtonState();
           });
 
         // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
         document
           .getElementById("downloadBtn")
           .addEventListener("click", function () {
-            var year = document.getElementById("yearDropdown").value;
-            window.open(tiffUrls[year], "_blank");
+            var selectedDecade =
+              document.getElementById("decadeDropdown").value;
+            var hwiSelector = document.getElementById("hwiSelector").value;
+
+            // Both selections are made and are different from 0, proceed with the download
+            window.open(tiffUrls[selectedDecade][hwiSelector], "_blank");
           });
 
         // Event listener for reset view button click
