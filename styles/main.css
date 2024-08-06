@@ -351,3 +351,117 @@ a.leaflet-control-zoom-in {
   flex-direction: column;
   gap: 12px;
 }
+button {
+  background: transparent;
+  position: relative;
+  border: none;
+}
+
+.dropdown {
+  position: relative;
+  font-size: 14px;
+
+  &.open {
+    z-index: 10;
+  }
+
+  .dropdown-trigger {
+    background: #fff;
+    position: relative;
+    border: none;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 20px 10px 20px;
+    box-shadow: 4px 4px 5.2px 0px #00000014;
+    border-radius: 4px;
+    cursor: pointer;
+
+    svg {
+      transition: all 0.3s;
+    }
+  }
+
+  &.open .dropdown-trigger svg {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-list {
+    position: absolute;
+    top: calc(100% - 4px);
+    padding-top: 4px;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 4px 4px 5.2px 0px #00000014;
+    border-radius: 0 0 4px 4px;
+    transition: all 0.3s;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+
+    li {
+      position: relative;
+      transition: all 0.3s;
+      cursor: pointer;
+      border-top: solid 1px #d2d1d1;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+        z-index: 2;
+      }
+
+      &.active {
+        display: none;
+      }
+
+      button {
+        padding: 0;
+        padding: 9px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        cursor: pointer;
+
+        .tooltip {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          p {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            background: #d3e1eb;
+            width: 120px;
+            padding: 10px;
+            font-size: 10px;
+            line-height: 14px;
+            text-align: left;
+            border-radius: 4px;
+            transition: all 0.3s;
+            pointer-events: none;
+            opacity: 0;
+          }
+
+          &:hover p {
+            opacity: 1;
+
+            top: 0;
+            pointer-events: auto;
+          }
+        }
+      }
+    }
+  }
+
+  &.open .dropdown-list {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
