@@ -131,3 +131,9 @@ Extreme values exceeding the mean by 1, 2, and 3 standard deviations are calcula
 
 Areas with significant changes are mapped by identifying regions with more than 50%, 100%, and 200% increases in heatwave indicator values from the 1960s to the 2020s.
 ![image](docs/img/ext2.png)
+
+### Interactive Maps
+Please visit https://unicef.github.io/heat/
+![image](docs/img/hwi_viz.png)
+
+
