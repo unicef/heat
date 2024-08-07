@@ -157,7 +157,7 @@
 
             legend.innerHTML += `
         <div style="display: flex; flex-direction: column;  align-items: center; gap: 4px; ">
-           <div style=" border: 0.5px solid white; background-color:  ${colorLookup[index]
+           <div style=" border: 0.5px solid #000000; background-color:  ${colorLookup[index]
                 }; width: 20px; height: 20px;"></div> 
             <div style="width: 100%; font-size: 10px;">${rangeMin.toFixed(
                     0
