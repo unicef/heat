@@ -23,18 +23,22 @@ jobs:
         id: venv-cache
         uses: actions/cache@v3
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock', '**/pyproject.toml') }}
+          path: geospatial/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('geospatial/**/poetry.lock', 'geospatial/**/pyproject.toml') }}
 
       - name: Install dependencies
         if: steps.venv-cache.outputs.cache-hit != 'true'
         run: poetry install --no-interaction --only dev
+        working-directory: geospatial
 
       - name: Check format with black
         run: poetry run black --check .
+        working-directory: geospatial
 
       - name: Check style with flake8
         run: poetry run flake8 .
+        working-directory: geospatial
 
       - name: Check import sorting with isort
         run: poetry run isort --check .
+        working-directory: geospatial

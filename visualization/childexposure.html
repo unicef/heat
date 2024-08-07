@@ -1,389 +1,274 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>UNICEF Children's Exposure</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="../assets/styles/reset.css" />
+    <link rel="stylesheet" href="../assets/styles/global.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-    <!-- Leaflet CSS for map styling -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
-    <!-- Styles for the map and UI elements -->
-    <style>
-        #controls {
-            margin: 10px;
-        }
-
-        #map {
-            height: 600px;
-            width: 100%;
-        }
-
-        #legend {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            padding: 10px;
-            background: white;
-            z-index: 1001;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        #loading {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
-        }
-
-        .spinner {
-            margin: 0 auto;
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #1cabe2;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-
-        .leaflet-container {
-            background-color: rgba(255, 0, 0, 0);
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Website title -->
-    <h1>Children's Exposure to Heatwaves</h1>
-
-    <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
-    <div id="controls">
-        <label for="yearDropdown">Year of Report:</label>
-        <select id="yearDropdown">
-            <option value="0">Select Year</option>
-            <option value="2023">2023</option>
-            <!-- Future options for other years can be added here -->
-        </select>
-
-        <label for="sub-indicator">Sub-indicator:</label>
-        <select id="sub-indicator">
-            <option value="0">Select Sub-indicator</option>
-            <option value="Heatwave Frequency">Frequency</option>
-            <option value="Heatwave Duration">Duration</option>
-            <option value="Heatwave Severity">Severity</option>
-            <option value="Extreme Heat Days">Extreme Heat Days</option>
-        </select>
-
-        <label for="percentage">Percentage Increase:</label>
-        <select id="percentage">
-            <option value="0">Select Percentage Increase</option>
-            <option value="50%">50%</option>
-            <option value="100%">100%</option>
-            <option value="200%">200%</option>
-        </select>
-
-        <!-- Button to download CSV and reset map view -->
-        <button id="downloadBtn" disabled style="margin-left: 10px">Download CSV</button>
-        <button id="reset-view">Reset View</button>
+  <body>
+    <div class="header">
+      <div class="wrapper">
+        <a href="https://www.unicef.org/">
+          <img src="../assets/img/header.png" alt="UNICEF Logo" />
+        </a>
+      </div>
     </div>
-
-    <!-- Map container -->
-    <div id="map">
-        <!-- Loading message container -->
-        <div id="loading">
-            <div style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-          ">
-                <div class="spinner"></div>
-                <p style="text-align: center; margin-top: 10px">Loading...</p>
-            </div>
+    <div class="wrapper">
+      <!-- Website title -->
+      <div class="titleBox">
+        <div class="logo">
+          <h1>Heatwave trends explorer</h1>
+          <div class="logo-container">
+            <p>Developed in collaboration with</p>
+            <a href="https://tryolabs.com/">
+              <img
+                src="../assets/img/logo.svg"
+                alt="Tryolabs Logo"
+                class="tryo"
+              />
+            </a>
+          </div>
         </div>
-        <!-- Color scale legend container -->
-        <div id="legend"></div>
-    </div>
+        <p class="subtitle">
+          Tracking heatwave indicators and children's exposure (1960-2020)
+        </p>
+      </div>
+      <div class="pages-buttons">
+        <a href="../index.html">
+          <button class="custom-button">Heatwave indicators</button>
+        </a>
+        <a href="./childexposure.html">
+          <button class="custom-button-active">Children's Exposure</button>
+        </a>
+      </div>
+      <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
+      <div class="container">
+        <div class="filters" id="controls">
+          <div class="filter-data">
+            <p>EXPLORE DATA</p>
+            <p>
+              Click on a country on the map to visualize how many children are
+              living in areas where the heatwave indicators have significantly
+              increased between 1960s and 2020s.
+            </p>
+          </div>
+          <div class="filtersGap">
+            <input type="hidden" id="yearDropdown" value="2023" />
 
-    <!-- Sum display -->
-    <div id="sum-display"></div>
+            <label for="sub-indicator">Indicator</label>
+
+            <div class="dropdown">
+              <input type="hidden" id="sub-indicator" />
+              <button class="dropdown-trigger">
+                <span>Select indicator</span>
+                <svg
+                  width="13"
+                  height="8"
+                  viewBox="0 0 13 8"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
+                    fill="#0093EF"
+                  />
+                </svg>
+              </button>
+              <ul class="dropdown-list">
+                <li>
+                  <button data-value="Heatwave Frequency" class="active">
+                    <span>Heatwave Frequency</span>
+                    <div class="tooltip">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                          fill="black"
+                        />
+                      </svg>
+                      <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua.
+                      </p>
+                    </div>
+                  </button>
+                </li>
+                <li>
+                  <button data-value="Heatwave Duration">
+                    <span>Heatwave Duration</span>
+                    <div class="tooltip">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                          fill="black"
+                        />
+                      </svg>
+                      <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua.
+                      </p>
+                    </div>
+                  </button>
+                </li>
+                <li>
+                  <button data-value="Heatwave Severity">
+                    <span>Heatwave Severity</span>
+                    <div class="tooltip">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                          fill="black"
+                        />
+                      </svg>
+                      <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua.
+                      </p>
+                    </div>
+                  </button>
+                </li>
+                <li>
+                  <button data-value="Extreme Heat Days">
+                    <span>Extreme Heat Days</span>
+                    <div class="tooltip">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                          fill="black"
+                        />
+                      </svg>
+                      <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua.
+                      </p>
+                    </div>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="filtersGap">
+            <label for="percentage">Percentage increase</label>
+            <div class="dropdown">
+              <input type="hidden" id="percentage" />
+              <button class="dropdown-trigger">
+                <span>Select percentage increase</span>
+                <svg
+                  width="13"
+                  height="8"
+                  viewBox="0 0 13 8"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
+                    fill="#0093EF"
+                  />
+                </svg>
+              </button>
+              <ul class="dropdown-list">
+                <li>
+                  <button data-value="50%"><span>50%</span></button>
+                </li>
+                <li>
+                  <button data-value="100%"><span>100%</span></button>
+                </li>
+                <li>
+                  <button data-value="200%"><span>200%</span></button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="legend"></div>
+          <div style="line-height: 20px" class="border" id="sum-display"></div>
+          <!-- Button to download CSV and reset map view -->
+          <button class="buttonDownload" id="downloadBtn" disabled>
+            DOWNLOAD .CSV
+          </button>
+        </div>
+
+        <!-- Map container -->
+        <div id="map">
+          <!-- Loading message container -->
+          <div id="loading">
+            <div
+              style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+              "
+            >
+              <div class="spinner"></div>
+              <p style="text-align: center; margin-top: 10px">Loading...</p>
+            </div>
+          </div>
+          <button class="buttonReset" id="reset-view">RESET ZOOM</button>
+        </div>
+      </div>
+      <div class="text-bottom">
+        <p>
+          The data presented on this page is sourced from lorem ipsum <br />
+          © UNICEF | Tryolabs 2024
+        </p>
+      </div>
+    </div>
 
     <!-- import necessary scripts -->
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="https://unpkg.com/georaster"></script>
-    <script src="https://unpkg.com/chroma-js"></script>
+    <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
-    <script>
-        (function () {
-            // This is to be able to embed the script into the index.html
-            // initalize leaflet map
-            var defaultView = [40, 0];
-            var defaultZoom = 2;
-            var map = L.map("map", {
-                minZoom: 2,
-                maxZoom: 18,
-                worldCopyJump: false, // Prevents the map from wrapping around
-            }).setView(defaultView, defaultZoom);
-
-            // add OpenStreetMap basemap
-            L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                noWrap: true,
-                attribution:
-                    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
-            }).addTo(map);
-
-            // Searchbox to search by location
-            var geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-            }).addTo(map);
-
-            geocoder.on("markgeocode", function (e) {
-                var center = e.geocode.center;
-                map.setView(center, 4);
-            });
-
-            var geojsonLayer;
-            var geojsonData;
-
-            // URLs for geojson files by year
-            const geojsonUrls = {
-                2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
-            };
-
-            // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
-            // The maximum value is defined as Max = Mean + 2 × Standard Deviation.
-            // Values exceeding this maximum will be saturated to minimize the skewing effect of very high values on the color scaling of the imagery.
-            const bandRanges = {
-                'Heatwave Frequency': { min: 0, max: 95 },   // Frequency
-                'Heatwave Duration': { min: 0, max: 40 },    // Duration
-                'Heatwave Severity': { min: 0, max: 95 },   // Severity
-                'Extreme Heat Days': { min: 0, max: 95 }   // Extreme High Temp.
-            };
-
-            const loadingDiv = document.getElementById("loading");
-
-            // Helper function to show or hide loading spinner
-            function toggleSpinner(show) {
-                loadingDiv.style.display = show ? "block" : "none";
-            }
-
-            // Helper function to get color based on value
-            function getColor(value, min, max, steps, colorLookup, overflowColor) {
-                if (value === null || value === undefined || isNaN(value)) {
-                    return null;
-                }
-
-                if (value > max) {
-                    // Return a specific color for values greater than max
-                    return overflowColor;
-                }
-
-                // Calculate the index for the color lookup
-                const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
-
-                // Return the color from the lookup
-                return colorLookup[index];
-            }
-
-            // Helper function to update the legend with color scale
-            function updateLegend(min, max, steps, colorLookup, overflowColor) {
-                var legend = document.getElementById('legend');
-                legend.innerHTML = '<strong>Color Scale</strong><br>';
-
-                // Calculate the range step size
-                const stepSize = (max - min) / steps;
-
-                // Create the color blocks and labels
-                for (let i = 0; i < steps; i++) {
-                    const rangeMin = min + i * stepSize;
-                    const rangeMax = min + (i + 1) * stepSize;
-
-                    // Calculate the index for the color lookup
-                    const index = Math.floor(((rangeMin - min) / (max - min)) * (steps - 1));
-
-                    legend.innerHTML += `
-                        <div style="background-color: ${colorLookup[index]}; width: 20px; height: 20px; display: inline-block;"></div>
-                        <label>${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}%</label><br>`;
-                }
-                // Add a new color box for values higher than the max
-                legend.innerHTML += `
-                    <div style="background-color: ${overflowColor}; width: 20px; height: 20px; display: inline-block;"></div>
-                    <label>${max}+</label><br>`;
-            }
-
-            // Function to update the map based on selected filters
-            function updateMap(subIndicator, percentage) {
-                const { min, max } = bandRanges[subIndicator];
-                const steps = 5;
-                const scale = chroma.scale('OrRd').domain([min, max]).classes(steps);
-                const colorLookup = scale.colors(steps); // Create a lookup table for colors
-                const overflowColor = '#500000';
-
-                var sum = 0; // For global statistics
-
-                updateLegend(min, max, steps, colorLookup, overflowColor);
-
-                if (geojsonLayer) {
-                    map.removeLayer(geojsonLayer);
-                    map.closePopup();
-                }
-
-                geojsonLayer = L.geoJson(geojsonData, {
-                    style: function (feature) {
-                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
-                        return {
-                            fillColor: getColor(value_percentage, min, max, steps, colorLookup, overflowColor),
-                            weight: 1,
-                            opacity: 1,
-                            color: '#b4cfd9',
-                            fillOpacity: 0.7
-                        };
-                    },
-                    onEachFeature: function (feature, layer) {
-                        var countryName = feature.properties['Country Name'];
-                        var value = feature.properties[subIndicator + " Increased by " + percentage];
-                        var value_percentage = feature.properties["Percentage " + subIndicator + " Increased by " + percentage];
-
-                        // Create popup content
-                        var popupContent;
-
-                        if (value === 0) { // change here if different value is used for NO DATA
-                            popupContent = `
-                                <div class="popup-header">In <strong>${countryName}</strong></div>
-                                <div class="popup-content">
-                                    No exposure data is currently available.
-                                </div>
-                            `;
-                        } else {
-                            popupContent = `
-                                <div class="popup-header">In <strong>${countryName}</strong></div>
-                                <div class="popup-content">
-                                    <strong>${value.toLocaleString()}</strong> children (~${value_percentage}% of total) live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s<br>
-                                </div>
-                            `;
-                        }
-
-                        // Add to the global sum if the value is defined and is a number
-                        if (value !== undefined && !isNaN(value)) {
-                            sum += value;
-                        }
-
-                        layer.bindPopup(popupContent);
-                    },
-                }).addTo(map);
-
-                // Display the sum below the map
-                var sumDisplay = document.getElementById('sum-display');
-                sumDisplay.innerHTML = `
-                    Globally, <strong>${sum.toLocaleString()}</strong> children live in areas where the <strong>${subIndicator}</strong> has increased by <strong>${percentage}</strong> since the 1960s.
-                `;
-            }
-
-            // Load the GeoJSON file for the selected year
-            function loadGeojsonForYear(year, subIndicator, percentage, callback) {
-                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
-                    toggleSpinner(true);
-
-                    var url = geojsonUrls[year];
-
-                    fetch(url, { cache: "force-cache" })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            geojsonData = data;
-                            if (callback) callback();
-                            toggleSpinner(false);
-                        })
-                        .catch((error) => {
-                            toggleSpinner(false);
-                            console.error("Error loading the GeoJSON file:", error);
-                            map.removeLayer(geojsonLayer);
-                            document.getElementById('legend').innerHTML = '';
-                        });
-                } else {
-                    // Remove the GeoJSON layer if it exists
-                    if (geojsonLayer) {
-                        map.removeLayer(geojsonLayer);
-                        document.getElementById('legend').innerHTML = '';
-                    }
-                }
-            }
-
-            // Helper function to update map based on the selected filters
-            function updateFilters() {
-                var year = document.getElementById("yearDropdown").value;
-                var subIndicator = document.getElementById("sub-indicator").value;
-                var percentage = document.getElementById("percentage").value;
-
-                loadGeojsonForYear(year, subIndicator, percentage, function () {
-                    updateMap(subIndicator, percentage);
-                });
-            }
-
-            //helper function to enable download botton when all filters are selected
-            function updateButtonState() {
-                var year = document.getElementById("yearDropdown").value;
-                var subIndicator = document.getElementById("sub-indicator").value;
-                var percentage = document.getElementById("percentage").value;
-
-                if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
-                    downloadBtn.disabled = false;
-                } else {
-                    downloadBtn.disabled = true;
-                }
-            }
-
-            // Event listeners for the filters
-            document
-                .getElementById("yearDropdown")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-            document.getElementById("sub-indicator")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-            document.getElementById("percentage")
-                .addEventListener("change", function () {
-                    updateFilters();
-                    updateButtonState();
-                });
-
-            // Listen for a click event on the 'downloadBtn' element and open a new tab with the URL to a TIFF file
-            document
-                .getElementById("downloadBtn")
-                .addEventListener("click", function () {
-                    var selectedYear = document.getElementById("yearDropdown").value;
-                    var csvUrl = `https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/Exposure_change_for_Countries_${selectedYear}.csv`;
-                    window.open(csvUrl, "_blank");
-                });
-
-            // Event listener for reset view button click
-            document
-                .getElementById("reset-view")
-                .addEventListener("click", function () {
-                    map.setView(defaultView, defaultZoom);
-                });
-        })();
-    </script>
-</body>
-
+    <script src="../assets/js/dropdown.js"></script>
+    <script src="../assets/js/children_exposure_map.js"></script>
+  </body>
 </html>
