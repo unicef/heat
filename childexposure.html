@@ -69,11 +69,7 @@
             <label for="sub-indicator">Indicator</label>
 
             <div class="dropdown">
-              <input
-                type="hidden"
-                id="sub-indicator"
-                value="Heatwave Frequency"
-              />
+              <input type="hidden" id="sub-indicator" />
               <button class="dropdown-trigger">
                 <span>Select indicator</span>
                 <svg
@@ -297,7 +293,7 @@
 
         // URLs for geojson files by year
         const geojsonUrls = {
-          2023: "http://dev.estudionk.com:3511/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
+          2023: "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
         };
 
         // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
@@ -503,7 +499,6 @@
           var subIndicator = document.getElementById("sub-indicator").value;
           var percentage = document.getElementById("percentage").value;
           var downloadBtn = document.getElementById("downloadBtn");
-
           if (year && subIndicator && percentage) {
             downloadBtn.disabled = false;
           } else {
