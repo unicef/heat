@@ -29,19 +29,19 @@
     const tiffUrls = {
         1960: {
             frequency:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1960s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1960s_proj_COG.tif",
             duration:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1960s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1960s_proj_COG.tif",
             severity:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1960s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1960s_proj_COG.tif",
             extreme_high_temp:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1960s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_extreme_high_temp_1960s_proj_COG.tif",
         },
         1970: {
             frequency:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1970s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_frequency_1970s_proj_COG.tif",
             duration:
-                "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1970s_proj_COG.tif",
+                "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_duration_1970s_proj_COG.tif",
             severity:
                 "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/cogs_by_hwi/average_heatwaves_severity_1970s_proj_COG.tif",
             extreme_high_temp:
