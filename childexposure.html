@@ -297,7 +297,7 @@
 
         // URLs for geojson files by year
         const geojsonUrls = {
-          2023: "https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
+          2023: "http://localhost:3001/proxy?url=https://unidatadapmclimatechange.blob.core.windows.net/public/heatwave/files_for_visualization/child_exposure_percent_2023_5decimals.geojson",
         };
 
         // Maximum and minimum values per sub-indicator are determined by calculating the mean and standard deviation for 2023 and 50% threshold.
@@ -459,7 +459,7 @@
 
         // Load the GeoJSON file for the selected year
         function loadGeojsonForYear(year, subIndicator, percentage, callback) {
-          if (year !== "0" && subIndicator !== "0" && percentage !== "0") {
+          if (year && subIndicator && percentage) {
             toggleSpinner(true);
 
             var url = geojsonUrls[year];
