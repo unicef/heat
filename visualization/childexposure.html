@@ -8,8 +8,8 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
     />
-    <link rel="stylesheet" href="../styles/reset.css" />
-    <link rel="stylesheet" href="../styles/global.css" />
+    <link rel="stylesheet" href="../assets/styles/reset.css" />
+    <link rel="stylesheet" href="../assets/styles/global.css" />
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
@@ -29,7 +29,9 @@
   <body>
     <div class="header">
       <div class="wrapper">
-        <img src="../img/header.png" alt="UNICEF Logo" />
+        <a href="https://www.unicef.org/">
+          <img src="../assets/img/header.png" alt="UNICEF Logo" />
+        </a>
       </div>
     </div>
     <div class="wrapper">
@@ -39,7 +41,13 @@
           <h1>Heatwave trends explorer</h1>
           <div class="logo-container">
             <p>Developed in collaboration with</p>
-            <img src="../img/logo.svg" alt="logo" class="tryo" />
+            <a href="https://tryolabs.com/">
+              <img
+                src="../assets/img/logo.svg"
+                alt="Tryolabs Logo"
+                class="tryo"
+              />
+            </a>
           </div>
         </div>
         <p class="subtitle">
@@ -260,7 +268,7 @@
     <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <script src="../js/dropdown.js"></script>
+    <script src="../assets/js/dropdown.js"></script>
     <script>
       (function () {
         // This is to be able to embed the script into the index.html
