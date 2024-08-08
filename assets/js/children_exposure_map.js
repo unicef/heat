@@ -73,7 +73,7 @@
     // Helper function to update the legend with color scale
     function updateLegend(min, max, steps, colorLookup, overflowColor) {
         var legend = document.getElementById("legend");
-        legend.innerHTML = '<div class="lead-title">Color Scale | <div><i>...(%)</i></div></div>';
+        legend.innerHTML = '<div class="lead-title">Color Scale | <div><i>% of exposed children</i></div></div>';
 
         // Calculate the range step size
         const stepSize = (max - min) / steps;

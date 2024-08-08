@@ -1,274 +1,211 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>UNICEF Children's Exposure</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
-    />
-    <link rel="stylesheet" href="../assets/styles/reset.css" />
-    <link rel="stylesheet" href="../assets/styles/global.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-      rel="stylesheet"
-    />
-  </head>
 
-  <body>
-    <div class="header">
-      <div class="wrapper">
-        <a href="https://www.unicef.org/">
-          <img src="../assets/img/header.png" alt="UNICEF Logo" />
-        </a>
-      </div>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UNICEF Children's Exposure</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="../assets/styles/reset.css" />
+  <link rel="stylesheet" href="../assets/styles/global.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <div class="header">
     <div class="wrapper">
-      <!-- Website title -->
-      <div class="titleBox">
-        <div class="logo">
-          <h1>Heatwave trends explorer</h1>
-          <div class="logo-container">
-            <p>Developed in collaboration with</p>
-            <a href="https://tryolabs.com/">
-              <img
-                src="../assets/img/logo.svg"
-                alt="Tryolabs Logo"
-                class="tryo"
-              />
-            </a>
+      <a href="https://www.unicef.org/">
+        <img src="../assets/img/header.png" alt="UNICEF Logo" />
+      </a>
+    </div>
+  </div>
+  <div class="wrapper">
+    <!-- Website title -->
+    <div class="titleBox">
+      <div class="logo">
+        <h1>Heatwave evolution monitor</h1>
+        <div class="logo-container">
+          <p>Developed in collaboration with</p>
+          <a href="https://tryolabs.com/">
+            <img src="../assets/img/logo.svg" alt="Tryolabs Logo" class="tryo" />
+          </a>
+        </div>
+      </div>
+      <p class="subtitle">
+        Tracking heatwave indicators and children's exposure (1960s-2020s)
+      </p>
+    </div>
+    <div class="pages-buttons">
+      <a href="../index.html">
+        <button class="custom-button">Heatwave indicators</button>
+      </a>
+      <a href="./childexposure.html">
+        <button class="custom-button-active">Children's Exposure</button>
+      </a>
+    </div>
+    <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
+    <div class="container">
+      <div class="filters" id="controls">
+        <div class="filter-data">
+          <p>EXPLORE DATA</p>
+          <p>
+            Use the filters and click on a country on the map to explore how many children live in areas where the
+            heatwave indicators have significantly
+            increased between 1960s and 2020s.
+          </p>
+        </div>
+        <div class="filtersGap">
+          <input type="hidden" id="yearDropdown" value="2023" />
+
+          <label for="sub-indicator">Indicator</label>
+
+          <div class="dropdown">
+            <input type="hidden" id="sub-indicator" />
+            <button class="dropdown-trigger">
+              <span>Select indicator</span>
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
+                  fill="#0093EF" />
+              </svg>
+            </button>
+            <ul class="dropdown-list">
+              <li>
+                <button data-value="Heatwave Frequency" class="active">
+                  <span>Heatwave Frequency</span>
+                  <div class="tooltip">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                        fill="black" />
+                    </svg>
+                    <p>
+                      Average number of heatwave events.
+                    </p>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button data-value="Heatwave Duration">
+                  <span>Heatwave Duration</span>
+                  <div class="tooltip">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                        fill="black" />
+                    </svg>
+                    <p>
+                      Average length of heatwave events.
+                    </p>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button data-value="Heatwave Severity">
+                  <span>Heatwave Severity</span>
+                  <div class="tooltip">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                        fill="black" />
+                    </svg>
+                    <p>
+                      Average exceedance in degrees Celsius of the heatwave threshold for each event.
+                    </p>
+                  </div>
+                </button>
+              </li>
+              <li>
+                <button data-value="Extreme Heat Days">
+                  <span>Extreme Heat Days</span>
+                  <div class="tooltip">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
+                        fill="black" />
+                    </svg>
+                    <p>
+                      Annual average number of days in which 35°C is exceeded.
+                    </p>
+                  </div>
+                </button>
+              </li>
+            </ul>
           </div>
         </div>
-        <p class="subtitle">
-          Tracking heatwave indicators and children's exposure (1960-2020)
-        </p>
-      </div>
-      <div class="pages-buttons">
-        <a href="../index.html">
-          <button class="custom-button">Heatwave indicators</button>
-        </a>
-        <a href="./childexposure.html">
-          <button class="custom-button-active">Children's Exposure</button>
-        </a>
-      </div>
-      <!-- Control panel for selecting sub-indicator, percentage increase, and download button-->
-      <div class="container">
-        <div class="filters" id="controls">
-          <div class="filter-data">
-            <p>EXPLORE DATA</p>
-            <p>
-              Click on a country on the map to visualize how many children are
-              living in areas where the heatwave indicators have significantly
-              increased between 1960s and 2020s.
-            </p>
+        <div class="filtersGap">
+          <label for="percentage">Percentage increase</label>
+          <div class="dropdown">
+            <input type="hidden" id="percentage" />
+            <button class="dropdown-trigger">
+              <span>Select percentage increase</span>
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
+                  fill="#0093EF" />
+              </svg>
+            </button>
+            <ul class="dropdown-list">
+              <li>
+                <button data-value="50%"><span>50%</span></button>
+              </li>
+              <li>
+                <button data-value="100%"><span>100%</span></button>
+              </li>
+              <li>
+                <button data-value="200%"><span>200%</span></button>
+              </li>
+            </ul>
           </div>
-          <div class="filtersGap">
-            <input type="hidden" id="yearDropdown" value="2023" />
-
-            <label for="sub-indicator">Indicator</label>
-
-            <div class="dropdown">
-              <input type="hidden" id="sub-indicator" />
-              <button class="dropdown-trigger">
-                <span>Select indicator</span>
-                <svg
-                  width="13"
-                  height="8"
-                  viewBox="0 0 13 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
-                    fill="#0093EF"
-                  />
-                </svg>
-              </button>
-              <ul class="dropdown-list">
-                <li>
-                  <button data-value="Heatwave Frequency" class="active">
-                    <span>Heatwave Frequency</span>
-                    <div class="tooltip">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
-                          fill="black"
-                        />
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua.
-                      </p>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-value="Heatwave Duration">
-                    <span>Heatwave Duration</span>
-                    <div class="tooltip">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
-                          fill="black"
-                        />
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua.
-                      </p>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-value="Heatwave Severity">
-                    <span>Heatwave Severity</span>
-                    <div class="tooltip">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
-                          fill="black"
-                        />
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua.
-                      </p>
-                    </div>
-                  </button>
-                </li>
-                <li>
-                  <button data-value="Extreme Heat Days">
-                    <span>Extreme Heat Days</span>
-                    <div class="tooltip">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.06787 9.34741H7.15121V6.09741H6.06787V9.34741ZM6.60954 5.01408C6.76301 5.01408 6.89175 4.96208 6.99575 4.85808C7.09975 4.75408 7.15157 4.62552 7.15121 4.47241C7.15084 4.3193 7.09884 4.19075 6.9952 4.08675C6.89157 3.98275 6.76301 3.93075 6.60954 3.93075C6.45607 3.93075 6.32751 3.98275 6.22387 4.08675C6.12023 4.19075 6.06823 4.3193 6.06787 4.47241C6.06751 4.62552 6.11951 4.75426 6.22387 4.85862C6.32823 4.96298 6.45679 5.0148 6.60954 5.01408ZM6.60954 12.0557C5.86023 12.0557 5.15607 11.9135 4.49704 11.6289C3.83801 11.3444 3.26475 10.9585 2.77725 10.4714C2.28975 9.98423 1.9039 9.41097 1.61971 8.75158C1.33551 8.09219 1.19323 7.38802 1.19287 6.63908C1.19251 5.89013 1.33479 5.18597 1.61971 4.52658C1.90462 3.86719 2.29047 3.29393 2.77725 2.80679C3.26402 2.31965 3.83729 1.9338 4.49704 1.64925C5.15679 1.36469 5.86096 1.22241 6.60954 1.22241C7.35812 1.22241 8.06229 1.36469 8.72204 1.64925C9.38179 1.9338 9.95505 2.31965 10.4418 2.80679C10.9286 3.29393 11.3146 3.86719 11.5999 4.52658C11.8852 5.18597 12.0273 5.89013 12.0262 6.63908C12.0251 7.38802 11.8828 8.09219 11.5994 8.75158C11.3159 9.41097 10.9301 9.98423 10.4418 10.4714C9.95361 10.9585 9.38034 11.3445 8.72204 11.6295C8.06373 11.9144 7.35957 12.0565 6.60954 12.0557ZM6.60954 10.9724C7.81926 10.9724 8.84391 10.5526 9.6835 9.71304C10.5231 8.87345 10.9429 7.8488 10.9429 6.63908C10.9429 5.42936 10.5231 4.4047 9.6835 3.56512C8.84391 2.72554 7.81926 2.30575 6.60954 2.30575C5.39982 2.30575 4.37516 2.72554 3.53558 3.56512C2.696 4.4047 2.27621 5.42936 2.27621 6.63908C2.27621 7.8488 2.696 8.87345 3.53558 9.71304C4.37516 10.5526 5.39982 10.9724 6.60954 10.9724Z"
-                          fill="black"
-                        />
-                      </svg>
-                      <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua.
-                      </p>
-                    </div>
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="filtersGap">
-            <label for="percentage">Percentage increase</label>
-            <div class="dropdown">
-              <input type="hidden" id="percentage" />
-              <button class="dropdown-trigger">
-                <span>Select percentage increase</span>
-                <svg
-                  width="13"
-                  height="8"
-                  viewBox="0 0 13 8"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M6.37426 7.26495C6.2097 7.26503 6.05131 7.20229 5.93142 7.08954L0.58136 2.05214C0.458069 1.93429 0.386344 1.77247 0.38182 1.60196C0.377295 1.43144 0.440336 1.26604 0.557204 1.14182C0.674072 1.01759 0.83529 0.944615 1.00572 0.938789C1.17615 0.932962 1.34197 0.994759 1.46705 1.11071L6.37426 5.73159L11.2821 1.11071C11.3439 1.05254 11.4166 1.00711 11.4959 0.977025C11.5753 0.946937 11.6598 0.932779 11.7446 0.935357C11.8294 0.937935 11.9129 0.9572 11.9903 0.992051C12.0676 1.0269 12.1374 1.07666 12.1956 1.13848C12.2537 1.20029 12.2991 1.27297 12.3292 1.35234C12.3593 1.43171 12.3734 1.51624 12.3709 1.60108C12.3683 1.68593 12.349 1.76944 12.3142 1.84684C12.2793 1.92424 12.2296 1.99402 12.1678 2.05219L6.81709 7.08954C6.6972 7.20229 6.53882 7.26503 6.37426 7.26495Z"
-                    fill="#0093EF"
-                  />
-                </svg>
-              </button>
-              <ul class="dropdown-list">
-                <li>
-                  <button data-value="50%"><span>50%</span></button>
-                </li>
-                <li>
-                  <button data-value="100%"><span>100%</span></button>
-                </li>
-                <li>
-                  <button data-value="200%"><span>200%</span></button>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div id="legend"></div>
-          <div style="line-height: 20px" class="border" id="sum-display"></div>
-          <!-- Button to download CSV and reset map view -->
-          <button class="buttonDownload" id="downloadBtn" disabled>
-            DOWNLOAD .CSV
-          </button>
         </div>
+        <div id="legend"></div>
+        <div style="line-height: 20px" class="border" id="sum-display"></div>
+        <!-- Button to download CSV and reset map view -->
+        <button class="buttonDownload" id="downloadBtn" disabled>
+          DOWNLOAD .CSV
+        </button>
+      </div>
 
-        <!-- Map container -->
-        <div id="map">
-          <!-- Loading message container -->
-          <div id="loading">
-            <div
-              style="
+      <!-- Map container -->
+      <div id="map">
+        <!-- Loading message container -->
+        <div id="loading">
+          <div style="
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-              "
-            >
-              <div class="spinner"></div>
-              <p style="text-align: center; margin-top: 10px">Loading...</p>
-            </div>
+              ">
+            <div class="spinner"></div>
+            <p style="text-align: center; margin-top: 10px">Loading...</p>
           </div>
-          <button class="buttonReset" id="reset-view">RESET ZOOM</button>
         </div>
-      </div>
-      <div class="text-bottom">
-        <p>
-          The data presented on this page is sourced from lorem ipsum <br />
-          © UNICEF | Tryolabs 2024
-        </p>
+        <button class="buttonReset" id="reset-view">RESET ZOOM</button>
       </div>
     </div>
+    <div class="text-bottom">
+      <p>
+        The data presented on this page is sourced from GHS Population data (GHS-POP - R2023A) and the UN's 2024 World
+        Population Prospects. <br />
+        © UNICEF | Tryolabs 2024
+      </p>
+    </div>
+  </div>
 
-    <!-- import necessary scripts -->
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/georaster"></script>
-    <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
-    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <script src="../assets/js/dropdown.js"></script>
-    <script src="../assets/js/children_exposure_map.js"></script>
-  </body>
+  <!-- import necessary scripts -->
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/georaster"></script>
+  <script src="https://unpkg.com/chroma-js@2.4.2/chroma.min.js"></script>
+  <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script src="../assets/js/dropdown.js"></script>
+  <script src="../assets/js/children_exposure_map.js"></script>
+</body>
+
 </html>
