@@ -122,7 +122,7 @@
     // Helper function to get color based on value
     // values higher than the max of the selected band are clamped to the darkest color (to prevent outliers from skewing the perceptual scaling of data).
     function getColor(value, min, max, steps, colorLookup, overflowColor) {
-        if (value > max) {
+        if (value >= max) {
             // Return a specific color for values greater than max
             return overflowColor;
         }
