@@ -128,11 +128,12 @@
         }
 
         // Calculate the index for the color lookup
-        const index = Math.floor(((value - min) / (max - min)) * (steps - 1));
+        const index = Math.floor(((value - min) / (max - min)) * steps);
 
         // Return the color from the lookup
         return colorLookup[index];
     }
+
 
     // Helper function to update the legend with color scale
     function updateLegend(min, max, steps, colorLookup, overflowColor) {
@@ -151,26 +152,19 @@
             const rangeMin = min + i * stepSize;
             const rangeMax = min + (i + 1) * stepSize;
 
-            const index = Math.floor(
-                ((rangeMin - min) / (max - min)) * (steps - 1)
-            );
-
-            legend.innerHTML += `
-        <div style="display: flex; flex-direction: column;  align-items: center; gap: 4px; ">
-           <div style=" border: 0.5px solid #000000; background-color:  ${colorLookup[index]
-                }; width: 20px; height: 20px;"></div> 
-            <div style="width: 100%; font-size: 10px;">${rangeMin.toFixed(
-                    0
-                )} - ${rangeMax.toFixed()}</div>
-     </div> `;
+            legend.innerHTML +=
+                `<div style="display: flex; flex-direction: column;  align-items: center; gap: 4px;">
+           <div style=" border: 0.5px solid #000000; background-color: ${colorLookup[i]}; width: 20px; height: 20px;"></div>
+            <div style="width: 100%; font-size: 10px;">${rangeMin.toFixed(0)} - ${rangeMax.toFixed(0)}</div>
+            </div>`;
         }
 
         // Add a new color box for values higher than the max
-        legend.innerHTML += `
-      <div style="display: flex; flex-direction: column; font-size: 10px; gap: 4px;">
-                <div style="background: ${overflowColor}; border: 1px solid white; width: 20px; height: 20px;"></div>
+        legend.innerHTML +=
+            `<div style="display: flex; flex-direction: column; font-size: 10px; gap: 4px;">
+                <div style="background: ${overflowColor}; border: 1px solid #000000; width: 20px; height: 20px;"></div>
                 <div>${max}+</div>
-              </div> `;
+              </div>`;
     }
 
     // Add raster layer to the map and update the legend with color scale
