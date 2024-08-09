@@ -141,7 +141,7 @@
         var hwiSelector = document.getElementById("hwiSelector");
         var band = hwiSelector
             .closest(".dropdown")
-            .querySelector(".active button").title;
+            .querySelector(".active button").getAttribute("legend-title");
         legend.innerHTML = `<div class="lead-title">Color Scale | <div><i>${band}</i></div></div>`;
 
         // Calculate the range step size
