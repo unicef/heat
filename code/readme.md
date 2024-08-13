@@ -18,11 +18,11 @@ This notebook analyzes heatwave indicators from 1960 to 2024. It includes data l
 ### 5. `child_population_high_res.ipynb`
 This notebook processes high-resolution child population data. It includes steps to read, clean, and analyze the data to understand the distribution and changes in child population over time. The analysis include visualizations and statistical summaries to highlight key findings.
 
-### 6. ‘extreme_exposure_high_res.ipynb’
+### 6. `extreme_exposure_high_res.ipynb`
 This notebook focuses on analyzing child population exposure to extreme heat across different decades. It calculates exposure metrics based on heatwave indicators. The results are stored in CSV files for further analysis or visualization.
 
-### 7. 'hwi_resample.ipynb'
+### 7. `hwi_resample.ipynb`
 This notebook serves the purpose of resampling heatwave indicators. Specifically, it takes the heatwave indicators calculated and aggregated by decade and adjusts their resolution to match the population data used in the analysis. 
 
-### 8. 'hwi_summary_country.ipynb'
+### 8. `hwi_summary_country.ipynb`
 In this notebook, heatwave indicators aggregated for decades are summarized based on country boundaries. The output is a CSV file containing relevant information.   
