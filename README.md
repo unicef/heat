@@ -4,6 +4,10 @@
 
 This project aims at producing heatwave indicators globally and measure the exposure of child population on extreme heatwaves indicator values and significant changes in them over time.
 
+### Interactive Maps
+Please visit the link to explore the maps! https://unicef.github.io/heat/
+[<img src="docs/img/hwi_viz.png">](https://unicef.github.io/heat/)
+
 ## Heatwave indicators definitions
 
 **Heatwave**: Any period of three days or more when the maximum temperature each day is in the top 10 per cent of the local 15-day average between 1960 and 1990.
@@ -132,9 +136,6 @@ Extreme values exceeding the mean by 1, 2, and 3 standard deviations are calcula
 Areas with significant changes are mapped by identifying regions with more than 50%, 100%, and 200% increases in heatwave indicator values from the 1960s to the 2020s.
 ![image](docs/img/ext2.png)
 
-### Interactive Maps
-Please visit https://unicef.github.io/heat/
-[<img src="docs/img/hwi_viz.png">](https://unicef.github.io/heat/)
 
 
 
