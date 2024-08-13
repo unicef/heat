@@ -134,6 +134,7 @@ Areas with significant changes are mapped by identifying regions with more than 
 
 ### Interactive Maps
 Please visit https://unicef.github.io/heat/
-![image](docs/img/hwi_viz.png)
+[<img src="docs/img/hwi_viz.png">](https://unicef.github.io/heat/)
+
 
 
