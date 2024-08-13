@@ -1,4 +1,4 @@
-# Heatwave Indicators and child population exposure between 1960 and 2024
+# Heatwave indicators and child population exposure between 1960 and 2024
 
 ## Purpose
 
